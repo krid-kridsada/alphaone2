@@ -5,16 +5,12 @@
 html,
 body,
 #root {
+  width: 100%;
   min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply rounded-full bg-slate-400/50;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-transparent;
+body {
+  font-family: "Inter", "Noto Sans Thai", "Noto Sans", system-ui, -apple-system, sans-serif;
 }

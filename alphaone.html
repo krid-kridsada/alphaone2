@@ -1,0 +1,1487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">import React, { useState, useEffect, useMemo, useRef } from 'react';</p>
+<p class="p1">import { Upload, Download, LayoutDashboard, Settings, Bell, Search, User, Users, Target, Sparkles, Filter, Share2, CheckCircle, Loader2, RefreshCw, Moon, Sun, CalendarDays, Clock, ArrowRight, Activity, AlertCircle, Info, Bug } from 'lucide-react';</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1">// --- Firebase Database Setup ---</p>
+<p class="p1">import { initializeApp } from 'firebase/app';</p>
+<p class="p1">import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';</p>
+<p class="p1">import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';</p>
+<p class="p2"><br></p>
+<p class="p1">let app, auth, db, appId;</p>
+<p class="p1">try {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (typeof __firebase_config !== 'undefined' &amp;&amp; __firebase_config) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const firebaseConfig = JSON.parse(__firebase_config);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>app = initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>auth = getAuth(app);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>db = getFirestore(app);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">} catch (e) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>console.warn("Firebase init info: Running without Firebase config.", e);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// --- Helper: CSV Parser ที่เสถียร รองรับ Newline ใน Quotes และรูปแบบจาก Excel ---</p>
+<p class="p1">const parseCSVStrict = (text) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const arr = [];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let quote = false;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let col = 0, row = 0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for (let c = 0; c &lt; text.length; c++) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let cc = text[c], nc = text[c+1];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>arr[row] = arr[row] || [];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>arr[row][col] = arr[row][col] || '';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cc === '"' &amp;&amp; quote &amp;&amp; nc === '"') { arr[row][col] += cc; ++c; continue; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cc === '"') { quote = !quote; continue; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cc === ',' &amp;&amp; !quote) { ++col; continue; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cc === '\r' &amp;&amp; nc === '\n' &amp;&amp; !quote) { ++row; col = 0; ++c; continue; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cc === '\n' &amp;&amp; !quote) { ++row; col = 0; continue; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cc === '\r' &amp;&amp; !quote) { ++row; col = 0; continue; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>arr[row][col] += cc;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (arr.length &lt; 2) return { headers: [], data: [] };</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const headers = arr[0].map(h =&gt; h.replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const data = [];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for (let i = 1; i &lt; arr.length; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const rowData = arr[i];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (rowData.length === 1 &amp;&amp; rowData[0].trim() === '') continue;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const obj = {};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>headers.forEach((h, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>obj[h] = rowData[idx] ? rowData[idx].trim() : '';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>data.push(obj);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>headers,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>data: data.filter(obj =&gt; Object.values(obj).some(val =&gt; val &amp;&amp; val.toString().trim() !== ''))<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">// --- MOCK DATA FOR MEETING CYCLE DASHBOARD ---</p>
+<p class="p1">const MOCK_MEETING_DATA = [</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 101, day: 'จันทร์', team: 'PM x Process', type: 'Progress Update', time: '09:30-09:45', title: 'Daily Sync', desc: 'อัปเดตงานกับ Process' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 102, day: 'อังคาร', team: 'PM x Process', type: 'Progress Update', time: '09:30-09:45', title: 'Daily Sync', desc: 'อัปเดตงานกับ Process' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 103, day: 'พุธ', team: 'PM x Process', type: 'Progress Update', time: '09:30-09:45', title: 'Daily Sync', desc: 'อัปเดตงานกับ Process' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 104, day: 'พฤหัสบดี', team: 'PM x Process', type: 'Progress Update', time: '09:30-09:45', title: 'Daily Sync', desc: 'อัปเดตงานกับ Process' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 105, day: 'ศุกร์', team: 'PM x Process', type: 'Progress Update', time: '09:30-09:45', title: 'Daily Sync', desc: 'อัปเดตงานกับ Process' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 106, day: 'พุธ', team: 'PM x Process', type: 'UAT', time: '13:30-17:30', title: 'UAT Phase', desc: 'ร่วมทดสอบระบบ UAT' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 107, day: 'ศุกร์', team: 'PM x Process', type: 'Progress Update', time: '09:00-11:00', title: 'Update &amp; Req Sync', desc: 'Update progress + คุย Req กับ User' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 201, day: 'จันทร์', team: 'Tech x Process', type: 'Progress Update', time: '13:30-17:30', title: 'Requirement Sync', desc: 'คุย Requirement กับ Process' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 202, day: 'อังคาร', team: 'Tech x Process', type: 'Deploy', time: '10:00-15:00', title: 'Deploy', desc: 'นำขึ้นระบบ Production' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 203, day: 'พุธ', team: 'Tech x Process', type: 'UAT', time: '13:30-17:30', title: 'UAT Support', desc: 'Support การทดสอบ UAT' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 204, day: 'พฤหัสบดี', team: 'Tech x Process', type: 'Fix Bug', time: '09:00-17:30', title: 'Fix Bug', desc: 'แก้ไขบัคจากรอบ UAT' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 205, day: 'ศุกร์', team: 'Tech x Process', type: 'Progress Update', time: '09:00-11:00', title: 'Update &amp; Req Sync', desc: 'Update progress + คุย Req กับ User' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 301, day: 'พุธ', team: 'User x Process x Tech', type: 'UAT', time: '13:30-17:30', title: 'UAT', desc: 'ทดสอบระบบ (User)' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 302, day: 'ศุกร์', team: 'User x Process x Tech', type: 'Progress Update', time: '09:00-11:00', title: 'Update &amp; Req Sync', desc: 'Update progress + คุย Req ร่วมกัน' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 401, day: 'จันทร์', team: 'Helpdesk', type: 'Demo / Troubleshooting', time: '13:00-16:00', title: 'Demo &amp; Troubleshoot', desc: 'สาธิตและแก้ปัญหาเบื้องต้น' }</p>
+<p class="p1">];</p>
+<p class="p2"><br></p>
+<p class="p1">const TEAMS = ['Tech x Process', 'PM x Process', 'User x Process x Tech', 'Helpdesk'];</p>
+<p class="p1">const DAYS = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];</p>
+<p class="p2"><br></p>
+<p class="p1">const TYPE_STYLES = {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'UAT': { light: 'bg-yellow-50 text-yellow-800 border border-yellow-200 border-l-4 border-l-yellow-400', dark: 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 border-l-4 border-l-yellow-500' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'Deploy': { light: 'bg-blue-50 text-blue-800 border border-blue-200 border-l-4 border-l-blue-400', dark: 'bg-blue-500/10 text-blue-300 border border-blue-500/20 border-l-4 border-l-blue-500' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'Fix Bug': { light: 'bg-orange-50 text-orange-800 border border-orange-200 border-l-4 border-l-orange-400', dark: 'bg-orange-500/10 text-orange-300 border border-orange-500/20 border-l-4 border-l-orange-500' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'Progress Update': { light: 'bg-emerald-50 text-emerald-800 border border-emerald-200 border-l-4 border-l-emerald-400', dark: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 border-l-4 border-l-emerald-500' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'Demo / Troubleshooting': { light: 'bg-purple-50 text-purple-800 border border-purple-200 border-l-4 border-l-purple-400', dark: 'bg-purple-500/10 text-purple-300 border border-purple-500/20 border-l-4 border-l-purple-500' },</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">const TEAM_ICONS = {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'Tech x Process': '💻',</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'PM x Process': '📊',</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'User x Process x Tech': '🤝',</p>
+<p class="p1"><span class="Apple-converted-space">  </span>'Helpdesk': '🎧'</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">// --- Meeting Cycle Dashboard Component ---</p>
+<p class="p1">const MeetingCycleDashboard = ({ isDarkMode }) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [selectedDay, setSelectedDay] = useState('จันทร์');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const getHeatmapColor = (count) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (count === 0) return isDarkMode ? 'bg-slate-800' : 'bg-slate-100';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (count === 1) return isDarkMode ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-700';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (count === 2) return isDarkMode ? 'bg-blue-700/60 text-white' : 'bg-blue-300 text-blue-900';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white';<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="flex flex-col gap-4 xl:gap-6 w-full max-w-7xl mx-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-6 shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className={`relative overflow-hidden p-4 xl:p-5 rounded-2xl border shadow-sm flex items-center gap-4 group transition-all hover:shadow-md ${isDarkMode ? 'bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border-indigo-700/50' : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-40 transition-transform duration-500 group-hover:scale-150 ${isDarkMode ? 'bg-purple-500' : 'bg-purple-400'}`}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`p-3 rounded-xl shrink-0 z-10 ${isDarkMode ? 'bg-indigo-500/20 text-indigo-300' : 'bg-white text-indigo-600 shadow-sm'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;Users size={24} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="z-10 flex-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex items-center gap-2 mb-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 ${isDarkMode ? 'bg-indigo-500/30 text-indigo-200' : 'bg-indigo-200 text-indigo-800'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;Sparkles size={10} /&gt; ทุกสิ้นเดือน</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 className={`font-bold text-sm xl:text-base ${isDarkMode ? 'text-white' : 'text-slate-800'}`}&gt;Retrospective (All Teams)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p className={`text-xs mt-0.5 ${isDarkMode ? 'text-indigo-200/80' : 'text-slate-600'}`}&gt;ทุกทีมเข้าร่วมเพื่อสรุปผลและปรับปรุงการทำงานร่วมกัน&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className={`relative overflow-hidden p-4 xl:p-5 rounded-2xl border shadow-sm flex items-center gap-4 group transition-all hover:shadow-md ${isDarkMode ? 'bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border-emerald-700/50' : 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-40 transition-transform duration-500 group-hover:scale-150 ${isDarkMode ? 'bg-teal-500' : 'bg-teal-400'}`}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`p-3 rounded-xl shrink-0 z-10 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white text-emerald-600 shadow-sm'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;Target size={24} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="z-10 flex-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex items-center gap-2 mb-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 ${isDarkMode ? 'bg-emerald-500/30 text-emerald-200' : 'bg-emerald-200 text-emerald-800'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;Sparkles size={10} /&gt; สัปดาห์แรกของเดือน</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 className={`font-bold text-sm xl:text-base ${isDarkMode ? 'text-white' : 'text-slate-800'}`}&gt;Steer-Co Meeting&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p className={`text-xs mt-0.5 ${isDarkMode ? 'text-emerald-200/80' : 'text-slate-600'}`}&gt;ประชุมคณะกรรมการบริหารและอัปเดตทิศทางโครงการ&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="grid grid-cols-1 xl:grid-cols-3 gap-4 xl:gap-6 items-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className={`xl:col-span-2 rounded-2xl border shadow-sm flex flex-col overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`px-5 py-4 border-b flex justify-between items-center ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 className={`font-bold text-lg flex items-center gap-2 ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;CalendarDays className={isDarkMode ? 'text-blue-400' : 'text-blue-600'} size={20}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Weekly Timeline View</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex flex-wrap gap-2 text-[10px] font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-yellow-500/10 border-yellow-500 text-yellow-400' : 'bg-yellow-50 border-yellow-400 text-yellow-700'}`}&gt;UAT&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-blue-500/10 border-blue-500 text-blue-400' : 'bg-blue-50 border-blue-400 text-blue-700'}`}&gt;Deploy&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-orange-500/10 border-orange-500 text-orange-400' : 'bg-orange-50 border-orange-400 text-orange-700'}`}&gt;Fix Bug&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'bg-emerald-50 border-emerald-400 text-emerald-700'}`}&gt;Update&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-purple-500/10 border-purple-500 text-purple-400' : 'bg-purple-50 border-purple-400 text-purple-700'}`}&gt;Demo&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="overflow-x-auto custom-scrollbar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="min-w-[1000px] p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className={`rounded-xl border overflow-hidden flex flex-col ${isDarkMode ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'} divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className={`grid grid-cols-[180px_repeat(5,1fr)] divide-x ${isDarkMode ? 'divide-slate-700' : 'divide-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`p-3 font-bold text-[11px] uppercase tracking-wider flex items-center justify-center ${isDarkMode ? 'bg-slate-800/50 text-slate-400' : 'bg-slate-50 text-slate-500'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>ทีม (Teams)</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{DAYS.map(day =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div key={day} className={`p-3 text-center font-bold text-sm cursor-pointer transition-colors ${selectedDay === day ? (isDarkMode ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100/50 text-blue-700') : (isDarkMode ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-800' : 'bg-slate-50 text-slate-700 hover:bg-white')} `} onClick={() =&gt; setSelectedDay(day)}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>{day}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>{TEAMS.map((team) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div key={team} className={`grid grid-cols-[180px_repeat(5,1fr)] divide-x ${isDarkMode ? 'divide-slate-700' : 'divide-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-4 flex flex-col justify-center items-start bg-transparent`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="text-xl mb-1"&gt;{TEAM_ICONS[team]}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;span className={`font-bold text-[11px] leading-tight ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}&gt;{team}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{DAYS.map(day =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>const tasks = MOCK_MEETING_DATA.filter(d =&gt; d.team === team &amp;&amp; d.day === day);</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div key={`${team}-${day}`} className={`p-2.5 flex flex-col gap-2 min-h-[110px] transition-colors ${selectedDay === day ? (isDarkMode ? 'bg-slate-800/50' : 'bg-blue-50/30') : 'bg-transparent'} hover:${isDarkMode ? 'bg-slate-800/30' : 'bg-slate-50'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{tasks.map(task =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>const style = TYPE_STYLES[task.type][isDarkMode ? 'dark' : 'light'];</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div key={task.id} className={`p-2.5 rounded-lg shadow-sm flex flex-col gap-1.5 hover:shadow-md transition-shadow cursor-default ${style}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span className="font-bold text-[10px] sm:text-[11px] leading-tight"&gt;{task.title}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="text-[9px] sm:text-[10px] font-medium opacity-80 flex items-center gap-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;Clock size={10} /&gt; {task.time}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="flex flex-col gap-4 xl:gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`p-5 rounded-2xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 className={`font-bold text-sm mb-3 ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;Workload Heatmap (ปริมาณงาน)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{DAYS.map(day =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dayTasksCount = MOCK_MEETING_DATA.filter(d =&gt; d.day === day).length;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const heatClass = getHeatmapColor(dayTasksCount);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>key={`heatmap-${day}`}<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={() =&gt; setSelectedDay(day)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className={`flex-1 flex flex-col items-center justify-center py-3 rounded-lg cursor-pointer transition-all border ${selectedDay === day ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900' : ''} ${heatClass} ${isDarkMode ? 'border-slate-700/50' : 'border-transparent'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span className="text-xs font-semibold mb-1"&gt;{day}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span className="text-lg font-bold"&gt;{dayTasksCount}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>)</p>
+<p class="p1"><span class="Apple-converted-space">              </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`flex-1 p-5 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;h3 className={`font-bold text-sm ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;รายละเอียด: วัน{selectedDay}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{MOCK_MEETING_DATA.filter(d =&gt; d.day === selectedDay).length} กิจกรรม</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex-1 overflow-y-auto space-y-3 pr-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{MOCK_MEETING_DATA.filter(d =&gt; d.day === selectedDay).length === 0 ? (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className={`text-center py-8 text-sm ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;ไม่มีกิจกรรมในวันนี้&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>MOCK_MEETING_DATA.filter(d =&gt; d.day === selectedDay).map(task =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>const style = TYPE_STYLES[task.type][isDarkMode ? 'dark' : 'light'];</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div key={`detail-${task.id}`} className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex justify-between items-start mb-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${style}`}&gt;{task.type}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] flex items-center gap-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;&lt;Clock size={12}/&gt; {task.time}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;h4 className={`font-bold text-sm mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}&gt;{task.title}&lt;/h4&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-xs mb-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}&gt;{task.desc}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className={`text-[10px] flex items-center gap-1.5 font-medium ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;UsersIcon size={12} /&gt; {task.team}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})</p>
+<p class="p1"><span class="Apple-converted-space">              </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className={`p-5 rounded-2xl border shadow-sm mt-2 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="flex items-center gap-2 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;Info size={16} className={isDarkMode ? 'text-blue-400' : 'text-blue-600'} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 className={`font-bold text-sm ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;Dependency Flow (ลำดับการทำงานมาตรฐาน)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-4 px-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`flex flex-col items-center p-3 rounded-xl min-w-[140px] text-center border ${isDarkMode ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' : 'bg-yellow-50 border-yellow-200 text-yellow-700'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="text-xs font-bold mb-1"&gt;1. UAT Phase&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="text-[10px] opacity-80"&gt;ทดสอบและค้นหาบัค&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;ArrowRight size={20} className={isDarkMode ? 'text-slate-600 rotate-90 sm:rotate-0' : 'text-slate-300 rotate-90 sm:rotate-0'} /&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`flex flex-col items-center p-3 rounded-xl min-w-[140px] text-center border ${isDarkMode ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-700'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="text-xs font-bold mb-1"&gt;2. Fix Bug&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="text-[10px] opacity-80"&gt;แก้ไขปัญหาที่พบ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;ArrowRight size={20} className={isDarkMode ? 'text-slate-600 rotate-90 sm:rotate-0' : 'text-slate-300 rotate-90 sm:rotate-0'} /&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`flex flex-col items-center p-3 rounded-xl min-w-[140px] text-center border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="text-xs font-bold mb-1"&gt;3. Deploy&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="text-[10px] opacity-80"&gt;นำขึ้นระบบจริง&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">const UsersIcon = ({size}) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"&gt;&lt;path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/&gt;&lt;circle cx="9" cy="7" r="4"/&gt;&lt;path d="M22 21v-2a4 4 0 0 0-3-3.87"/&gt;&lt;path d="M16 3.13a4 4 0 0 1 0 7.75"/&gt;&lt;/svg&gt;</p>
+<p class="p1">);</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1">export default function App() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [activeMenu, setActiveMenu] = useState('overview');<span class="Apple-converted-space"> </span></p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [rawData, setRawData] = useState([]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [headers, setHeaders] = useState([]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [defectData, setDefectData] = useState([]);<span class="Apple-converted-space"> </span></p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [filters, setFilters] = useState({ month: 'All', area: 'All' });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [defectFilters, setDefectFilters] = useState({ month: 'All', area: 'All' });</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [toastMessage, setToastMessage] = useState('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [hoveredPoint, setHoveredPoint] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [exportMenuOpen, setExportMenuOpen] = useState(false);<span class="Apple-converted-space"> </span></p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [isDarkMode, setIsDarkMode] = useState(true);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [user, setUser] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [isSyncing, setIsSyncing] = useState(true);</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!auth) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setIsSyncing(false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const initAuth = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (typeof __initial_auth_token !== 'undefined' &amp;&amp; __initial_auth_token) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await signInWithCustomToken(auth, __initial_auth_token);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await signInAnonymously(auth);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.warn("Auth Info: Network offline or blocked. Running in local/sheet mode.");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setIsSyncing(false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>initAuth();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const unsubscribe = onAuthStateChanged(auth, setUser);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return () =&gt; unsubscribe();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!user || !db) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'boards', 'sharedState');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const unsubscribe = onSnapshot(docRef, (docSnap) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (docSnap.exists()) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const cloudData = docSnap.data();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (cloudData.rawData) setRawData(JSON.parse(cloudData.rawData));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (cloudData.headers) setHeaders(JSON.parse(cloudData.headers));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (cloudData.defectData) setDefectData(JSON.parse(cloudData.defectData));<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setIsSyncing(false);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}, (error) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.warn("Firestore sync info: Offline mode active.");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setIsSyncing(false);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return () =&gt; unsubscribe();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, [user]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const saveToCloud = async (newData, newHeaders, newDefectData = defectData) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!user || !db) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'boards', 'sharedState');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>await setDoc(docRef, {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>rawData: JSON.stringify(newData),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>headers: JSON.stringify(newHeaders),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>defectData: JSON.stringify(newDefectData),<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>updatedAt: new Date().toISOString()</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.error("Save to cloud failed", error);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const showToast = (msg) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setToastMessage(msg);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setTimeout(() =&gt; setToastMessage(''), 3000);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleSyncFromGoogleSheet = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setIsSyncing(true);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const sheetId = '1ZvLfOB9eF-k0vY1GWazJLBTQq-w5DM3enCAORChCNwk';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const timestamp = new Date().getTime();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const mainUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&amp;t=${timestamp}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const defectUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&amp;gid=1329297716&amp;t=${timestamp}`;</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const [mainResponse, defectResponse] = await Promise.all([</p>
+<p class="p1"><span class="Apple-converted-space">        </span>fetch(mainUrl),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>fetch(defectUrl)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!mainResponse.ok || !defectResponse.ok) throw new Error('Network response was not ok');</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const mainText = await mainResponse.text();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const defectText = await defectResponse.text();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const { data: parsedDefectData } = parseCSVStrict(defectText);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const processedDefectData = parsedDefectData.map((item, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let boardStatus = 'Todo';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const keys = Object.keys(item);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const colH = keys.length &gt; 7 ? keys[7] : null;<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (item['BoardStatus']) {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>boardStatus = item['BoardStatus'];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else if (colH &amp;&amp; item[colH]) {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>const val = item[colH].toString().toLowerCase().trim();</p>
+<p class="p1"><span class="Apple-converted-space">           </span>if (val.includes('done') || val.includes('pass') || val.includes('เสร็จ') || val.includes('close')) boardStatus = 'Prod';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else if (val.includes('retest')) boardStatus = 'UAT';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else if (val.includes('progress') || val.includes('กำลัง')) boardStatus = 'Task';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else if (val.includes('not start')) boardStatus = 'Todo';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return { ...item, BoardStatus: boardStatus, id: `def-${idx}-${Math.random().toString(36).substr(2, 5)}` };</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setDefectData(processedDefectData);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const { headers: parsedHeaders, data: mainData } = parseCSVStrict(mainText);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const processedData = mainData.map((item, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let boardStatus = 'Todo';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (item['BoardStatus']) {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>boardStatus = item['BoardStatus'];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>const techStatus = (item['Status Progress Tech Team'] || '').trim().toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">           </span>if (techStatus === 'not start') boardStatus = 'Todo';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else if (techStatus === 'in progress') boardStatus = 'Task';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else if (techStatus === 'uat') boardStatus = 'UAT';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else if (techStatus === 'done') boardStatus = 'Prod';</p>
+<p class="p1"><span class="Apple-converted-space">           </span>else boardStatus = 'Todo';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return { ...item, BoardStatus: boardStatus, id: `main-${idx}-${Math.random().toString(36).substr(2, 5)}` };</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const newHeaders = parsedHeaders.includes('BoardStatus') ? parsedHeaders : [...parsedHeaders, 'BoardStatus'];</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>setHeaders(newHeaders);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setRawData(processedData);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>saveToCloud(processedData, newHeaders, processedDefectData);<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>showToast('🔄 ดึงข้อมูลโครงการ และ Defect จาก Sheet ล่าสุดสำเร็จแล้วค่ะ!');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.error("Error fetching Google Sheet:", error);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>showToast('❌ ซิงค์ข้อมูลล้มเหลว (ตรวจสอบการแชร์ Sheet เป็นทุกคนที่มีลิงก์)');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setIsSyncing(false);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleShareLink = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const url = window.location.href;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (navigator.clipboard &amp;&amp; window.isSecureContext) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await navigator.clipboard.writeText(url);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>showToast('🔗 คัดลอกลิงก์สำเร็จ! นำไปแชร์ให้ทีมได้เลยค่ะ');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const textArea = document.createElement("textarea");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>textArea.value = url;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.body.appendChild(textArea);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>textArea.select();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.execCommand('copy');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.body.removeChild(textArea);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>showToast('🔗 คัดลอกลิงก์สำเร็จ! นำไปแชร์ให้ทีมได้เลยค่ะ');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.error('Copy failed', err);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>showToast('❌ คัดลอกล้มเหลว กรุณาก๊อปปี้จากช่อง URL โดยตรงค่ะ');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleExport = async (format, dataToExport, fileNamePrefix) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!dataToExport || dataToExport.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>showToast('⚠️ ไม่มีข้อมูลสำหรับส่งออก');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (format === 'csv') {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const exportHeaders = Object.keys(dataToExport[0] || {});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const csvContent = [exportHeaders.map(h =&gt; `"${h}"`).join(',')];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>dataToExport.forEach(row =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const rowString = exportHeaders.map(h =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let val = row[h] || '';</p>
+<p class="p1"><span class="Apple-converted-space">          </span>val = val.toString().replace(/"/g, '""');</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return `"${val}"`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}).join(',');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>csvContent.push(rowString);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const blob = new Blob([bom, csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const link = document.createElement("a");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const url = URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>link.setAttribute("href", url);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>link.setAttribute("download", `${fileNamePrefix}.csv`);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>link.style.display = 'none';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.body.appendChild(link);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>link.click();</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.body.removeChild(link);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.URL.revokeObjectURL(url);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}, 150);</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>showToast('✅ ส่งออกไฟล์ .csv สำเร็จ!');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>else if (format === 'xlsx') {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setIsSyncing(true);<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (typeof window.XLSX === 'undefined') {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await new Promise((resolve, reject) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const script = document.createElement('script');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>script.onload = resolve;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>script.onerror = reject;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.head.appendChild(script);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const worksheet = window.XLSX.utils.json_to_sheet(dataToExport);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const workbook = window.XLSX.utils.book_new();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.XLSX.utils.book_append_sheet(workbook, worksheet, "Data");</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.XLSX.writeFile(workbook, `${fileNamePrefix}.xlsx`);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>showToast('✅ ส่งออกไฟล์ .xlsx สำเร็จ!');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error('Export XLSX error:', error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>showToast('❌ เกิดข้อผิดพลาดในการสร้างไฟล์ Excel');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setIsSyncing(false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setExportMenuOpen(false);<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const overviewMonthColName = rawData.length &gt; 0 &amp;&amp; Object.keys(rawData[0]).length &gt; 9<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>? Object.keys(rawData[0])[9]<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>: 'Revise Estimate Deliver';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// อ่านชื่อหัวคอลัมน์ N (Index 13) เพื่อนำมาใช้อ้างอิงดึงข้อมูลวันที่</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const overviewColN = rawData.length &gt; 0 &amp;&amp; Object.keys(rawData[0]).length &gt; 13 ? Object.keys(rawData[0])[13] : null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ฟังก์ชันจัดฟอร์แมตวันที่ให้เป็น dd/mm/yyyy เสมอ</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const formatDateDDMMYYYY = (dateStr) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!dateStr || String(dateStr).trim() === '' || String(dateStr).trim() === '-') return '';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const str = String(dateStr).trim();</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ตรวจสอบแบบที่มี / หรือ - คั่น</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (str.includes('/') || str.includes('-')) {</p>
+<p class="p1"><span class="Apple-converted-space">       </span>const parts = str.split(/[-/]/);</p>
+<p class="p1"><span class="Apple-converted-space">       </span>if (parts.length &gt;= 3) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let d, m, y;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (parts[0].length === 4) { // กรณีมาแบบ YYYY-MM-DD</p>
+<p class="p1"><span class="Apple-converted-space">             </span>y = parts[0]; m = parts[1]; d = parts[2].split(' ')[0];<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>} else { // กรณีมาแบบ DD/MM/YYYY หรือ MM/DD/YYYY</p>
+<p class="p1"><span class="Apple-converted-space">             </span>d = parts[0]; m = parts[1]; y = parts[2].split(' ')[0];</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (y.length === 2) y = '20' + y; // ถ้าปีมาแค่ 2 หลักให้เติม 20 ด้านหน้า</p>
+<p class="p1"><span class="Apple-converted-space">          </span>return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;</p>
+<p class="p1"><span class="Apple-converted-space">       </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// กรณีอื่น ๆ ลองใช้ Date parser มาตรฐาน</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const dateObj = new Date(str);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!isNaN(dateObj.getTime())) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const d = String(dateObj.getDate()).padStart(2, '0');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const m = String(dateObj.getMonth() + 1).padStart(2, '0');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const y = dateObj.getFullYear();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return `${d}/${m}/${y}`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return str;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filteredData = useMemo(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return rawData.filter(item =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const matchMonth = filters.month === 'All' || item[overviewMonthColName] === filters.month;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const matchArea = filters.area === 'All' || item['Area'] === filters.area;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return matchMonth &amp;&amp; matchArea;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, [rawData, filters, overviewMonthColName]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const monthOptions = useMemo(() =&gt; ['All', ...new Set(rawData.map(item =&gt; item[overviewMonthColName]).filter(v =&gt; Boolean(v) &amp;&amp; v !== 'All'))], [rawData, overviewMonthColName]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const areaOptions = useMemo(() =&gt; ['All', ...new Set(rawData.map(item =&gt; item['Area']).filter(v =&gt; Boolean(v) &amp;&amp; v !== 'All'))], [rawData]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const totalTasks = filteredData.length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const completedTasks = filteredData.filter(item =&gt; item.BoardStatus === 'Prod').length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const uatTasks = filteredData.filter(item =&gt; item.BoardStatus === 'UAT').length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const inProgressTasks = filteredData.filter(item =&gt; item.BoardStatus === 'Task').length;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const progressPercent = totalTasks &gt; 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleDragStart = (e, id) =&gt; e.dataTransfer.setData('taskId', id);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleDragOver = (e) =&gt; e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleDrop = (e, status) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const id = e.dataTransfer.getData('taskId');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const updatedData = rawData.map(item =&gt; item.id === id ? { ...item, BoardStatus: status } : item);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setRawData(updatedData);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>saveToCloud(updatedData, headers, defectData);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectMonthColName = defectData.length &gt; 0 &amp;&amp; Object.keys(defectData[0]).length &gt; 12<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>? Object.keys(defectData[0])[12]<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>: 'Month';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectAreaColName = defectData.length &gt; 0 ? (Object.keys(defectData[0]).find(k =&gt; k.includes('Area') || k.includes('พื้นที่')) || 'Area') : 'Area';</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filteredDefectData = useMemo(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return defectData.filter(item =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const matchMonth = defectFilters.month === 'All' || item[defectMonthColName] === defectFilters.month;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const matchArea = defectFilters.area === 'All' || item[defectAreaColName] === defectFilters.area;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return matchMonth &amp;&amp; matchArea;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, [defectData, defectFilters, defectMonthColName, defectAreaColName]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectMonthOptions = useMemo(() =&gt; ['All', ...new Set(defectData.map(item =&gt; item[defectMonthColName]).filter(v =&gt; Boolean(v) &amp;&amp; v !== 'All'))], [defectData, defectMonthColName]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectAreaOptions = useMemo(() =&gt; ['All', ...new Set(defectData.map(item =&gt; item[defectAreaColName]).filter(v =&gt; Boolean(v) &amp;&amp; v !== 'All'))], [defectData, defectAreaColName]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectKeys = defectData.length &gt; 0 ? Object.keys(defectData[0]) : [];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const colA = defectKeys.length &gt; 0 ? defectKeys[0] : null;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const colC = defectKeys.length &gt; 2 ? defectKeys[2] : null;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const colH = defectKeys.length &gt; 7 ? defectKeys[7] : null;<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const isDefectDone = (item) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!colH) return false;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const val = item[colH] ? item[colH].toString().trim() : '';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!val || val === '-' || val.toLowerCase() === 'n/a' || val.toLowerCase() === 'pending' || val.toLowerCase() === 'no') return false;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (colH.toLowerCase().includes('status') || colH.includes('สถานะ')) {</p>
+<p class="p1"><span class="Apple-converted-space">       </span>const lowerVal = val.toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">       </span>return lowerVal.includes('done') || lowerVal.includes('pass') || lowerVal.includes('เสร็จ') || lowerVal.includes('close') || lowerVal.includes('prod');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return true;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectTotalCount = filteredDefectData.filter(item =&gt; colA &amp;&amp; item[colA] &amp;&amp; item[colA].toString().trim() !== '').length;</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBkkItems = filteredDefectData.filter(item =&gt; colC &amp;&amp; item[colC] &amp;&amp; item[colC].toString().toLowerCase().includes('bkk'));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBkkCount = defectBkkItems.length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBkkDone = defectBkkItems.filter(isDefectDone).length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBkkPending = defectBkkCount - defectBkkDone;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBranchItems = filteredDefectData.filter(item =&gt; colC &amp;&amp; item[colC] &amp;&amp; item[colC].toString().toLowerCase().includes('branch'));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBranchCount = defectBranchItems.length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBranchDone = defectBranchItems.filter(isDefectDone).length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectBranchPending = defectBranchCount - defectBranchDone;</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectProductionCount = filteredDefectData.filter(isDefectDone).length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defectProgressPercent = defectTotalCount &gt; 0 ? Math.round((defectProductionCount / defectTotalCount) * 100) : 0;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleDefectDrop = (e, status) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const id = e.dataTransfer.getData('taskId');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const updatedData = defectData.map(item =&gt; item.id === id ? { ...item, BoardStatus: status } : item);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setDefectData(updatedData);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>saveToCloud(rawData, headers, updatedData);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const renderBurndownChart = (dataToRender, mode = 'overview') =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (dataToRender.length === 0) return &lt;div className={`flex items-center justify-center h-full ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}&gt;ยังไม่มีข้อมูลสำหรับสร้างกราฟ&lt;/div&gt;;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const formatToMonthYear = (dateStr) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!dateStr) return null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const str = String(dateStr).trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (/^[A-Za-z]{3}-\d{4}$/.test(str)) return str;<span class="Apple-converted-space"> </span></p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>let d = new Date(str);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (isNaN(d.getTime()) &amp;&amp; str.includes('/')) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const parts = str.split('/');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (parts.length &gt;= 3) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let day = parseInt(parts[0], 10);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let month = parseInt(parts[1], 10);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let year = parseInt(parts[2], 10);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (year &lt; 100) year += 2000;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (month &gt; 12) { const t = day; day = month; month = t; }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>d = new Date(year, month - 1, day);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else if (isNaN(d.getTime()) &amp;&amp; str.includes('-')) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const parts = str.split('-');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (parts.length === 3 &amp;&amp; parts[0].length &lt;= 2) {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>let day = parseInt(parts[0], 10);</p>
+<p class="p1"><span class="Apple-converted-space">           </span>let month = parseInt(parts[1], 10);</p>
+<p class="p1"><span class="Apple-converted-space">           </span>let year = parseInt(parts[2], 10);</p>
+<p class="p1"><span class="Apple-converted-space">           </span>if (year &lt; 100) year += 2000;</p>
+<p class="p1"><span class="Apple-converted-space">           </span>d = new Date(year, month - 1, day);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!isNaN(d.getTime())) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `${months[d.getMonth()]}-${d.getFullYear()}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return str;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const getMonthValue = (item) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (mode === 'defect') {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const keys = Object.keys(item);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (keys.length &gt; 12) {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>const colM = keys[12];<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">           </span>return formatToMonthYear(item[colM]);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const keys = Object.keys(item);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (keys.length &gt; 9) {</p>
+<p class="p1"><span class="Apple-converted-space">         </span>const colJ = keys[9];<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">         </span>return formatToMonthYear(item[colJ]);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const parseMonthYear = (str) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!str || typeof str !== 'string') return 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const parts = str.split('-');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (parts.length !== 2) return 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const [m, y] = parts;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const months = {Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11};</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return new Date(y, months[m] || 0).getTime();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let validData = dataToRender.map(t =&gt; ({ ...t, _chartMonth: getMonthValue(t) })).filter(t =&gt; t._chartMonth &amp;&amp; t._chartMonth !== 'undefined' &amp;&amp; t._chartMonth !== 'null');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const uniqueMonths = [...new Set(validData.map(t =&gt; t._chartMonth))];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>uniqueMonths.sort((a, b) =&gt; parseMonthYear(a) - parseMonthYear(b));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const xLabels = ['Start', ...uniqueMonths];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const total = dataToRender.length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let idealRemaining = total;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let actualRemaining = total;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const idealData = [total];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const actualData = [total];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const targetCounts = [total];<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const doneCounts = [0];<span class="Apple-converted-space">       </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const pendingCounts = [total];<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>uniqueMonths.forEach(month =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const tasksInMonth = validData.filter(t =&gt; t._chartMonth === month);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const doneInMonth = tasksInMonth.filter(t =&gt; t.BoardStatus === 'Prod');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>targetCounts.push(tasksInMonth.length);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doneCounts.push(doneInMonth.length);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pendingCounts.push(tasksInMonth.length - doneInMonth.length);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>idealRemaining -= tasksInMonth.length;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>actualRemaining -= doneInMonth.length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>idealData.push(idealRemaining);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>actualData.push(actualRemaining);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const w = 600;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const h = 200;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const paddingX = 40;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const paddingY = 20;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const getX = (index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (xLabels.length === 1) return w / 2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return paddingX + (index * ((w - paddingX * 2) / (xLabels.length - 1)));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const getY = (val) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">       </span>if (total === 0) return h - paddingY;</p>
+<p class="p1"><span class="Apple-converted-space">       </span>return paddingY + ((total - val) / total) * (h - paddingY * 2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const idealPath = idealData.map((val, i) =&gt; `${getX(i)},${getY(val)}`).join(' ');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const actualPath = actualData.map((val, i) =&gt; `${getX(i)},${getY(val)}`).join(' ');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="relative w-full h-full" onMouseLeave={() =&gt; setHoveredPoint(null)}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;line x1={paddingX} y1={paddingY} x2={w - paddingX} y2={paddingY} stroke={isDarkMode ? "#334155" : "#f1f5f9"} strokeWidth="1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;line x1={paddingX} y1={h/2} x2={w - paddingX} y2={h/2} stroke={isDarkMode ? "#334155" : "#f1f5f9"} strokeWidth="1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;line x1={paddingX} y1={h - paddingY} x2={w - paddingX} y2={h - paddingY} stroke={isDarkMode ? "#475569" : "#e2e8f0"} strokeWidth="2" /&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;text x={paddingX - 10} y={getY(total) + 4} fontSize="10" fill={isDarkMode ? "#64748b" : "#94a3b8"} textAnchor="end"&gt;{total}&lt;/text&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;text x={paddingX - 10} y={getY(total/2) + 4} fontSize="10" fill={isDarkMode ? "#64748b" : "#94a3b8"} textAnchor="end"&gt;{Math.round(total/2)}&lt;/text&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;text x={paddingX - 10} y={getY(0) + 4} fontSize="10" fill={isDarkMode ? "#64748b" : "#94a3b8"} textAnchor="end"&gt;0&lt;/text&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;polyline points={idealPath} fill="none" stroke={isDarkMode ? "#64748b" : "#cbd5e1"} strokeWidth="3" strokeDasharray="5,5" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;polyline points={actualPath} fill="none" stroke={isDarkMode ? "#3b82f6" : "#3b82f6"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{xLabels.map((label, i) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const pointTime = label === 'Start' ? 0 : parseMonthYear(label);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const isCurrentOrPast = pointTime &lt;= new Date().getTime();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const isOnTarget = actualData[i] &lt;= idealData[i];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let pointColor = "#3b82f6";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let isBlinking = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (isOnTarget) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>pointColor = "#22c55e";<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (isCurrentOrPast) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>pointColor = "#eab308";<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">              </span>isBlinking = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;g<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>key={`point-${i}`}<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>className="cursor-pointer group"</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onMouseEnter={() =&gt; setHoveredPoint({</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>label,</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>target: targetCounts[i],</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>done: doneCounts[i],</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>pending: pendingCounts[i],</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>x: getX(i),</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>y: Math.min(getY(idealData[i]), getY(actualData[i]))</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;rect x={getX(i) - 20} y={0} width={40} height={h} fill="transparent" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;circle cx={getX(i)} cy={getY(idealData[i])} r="4" fill={isDarkMode ? "#64748b" : "#94a3b8"} /&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;circle cx={getX(i)} cy={getY(actualData[i])} r="5" fill={pointColor} stroke={isDarkMode ? "#1e293b" : "#fff"} strokeWidth="2" className={isBlinking ? 'animate-pulse' : ''} /&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;text x={getX(i)} y={h - 2} fontSize="10" fill={isDarkMode ? "#94a3b8" : "#64748b"} textAnchor="middle" className={`group-hover:font-bold transition-colors ${isBlinking ? 'group-hover:text-yellow-400' : (isOnTarget ? 'group-hover:text-green-400' : 'group-hover:text-blue-400')}`}&gt;{label}&lt;/text&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/g&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/svg&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>{hoveredPoint &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div</p>
+<p class="p1"><span class="Apple-converted-space">            </span>className={`absolute z-50 px-4 py-3 rounded-xl shadow-2xl text-xs pointer-events-none transform -translate-x-1/2 -translate-y-full border transition-all duration-200 min-w-[160px] ${isDarkMode ? 'bg-slate-800 border-slate-600 text-slate-200' : 'bg-white border-slate-200 text-slate-700'}`}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>style={{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>left: `${(hoveredPoint.x / w) * 100}%`,</p>
+<p class="p1"><span class="Apple-converted-space">              </span>top: `calc(${(hoveredPoint.y / h) * 100}% - 16px)`</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className={`font-bold border-b pb-2 mb-2 text-center text-sm ${isDarkMode ? 'border-slate-600 text-blue-300' : 'border-slate-100 text-blue-700'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{hoveredPoint.label === 'Start' ? 'ภาพรวมก่อนเริ่มโครงการ' : hoveredPoint.label}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex justify-between gap-4 items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}&gt;ที่ต้องส่ง:&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span className={`font-bold px-2 py-0.5 rounded ${isDarkMode ? 'text-amber-400 bg-amber-400/10' : 'text-amber-600 bg-amber-50'}`}&gt;{hoveredPoint.target} ตัว&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex justify-between gap-4 items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}&gt;ทำเสร็จไป:&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span className={`font-bold px-2 py-0.5 rounded ${isDarkMode ? 'text-green-400 bg-green-400/10' : 'text-green-600 bg-green-50'}`}&gt;{hoveredPoint.done} ตัว&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex justify-between gap-4 items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}&gt;คงค้าง:&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span className={`font-bold px-2 py-0.5 rounded ${isDarkMode ? 'text-rose-400 bg-rose-400/10' : 'text-rose-600 bg-rose-50'}`}&gt;{hoveredPoint.pending} ตัว&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className={`absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] ${isDarkMode ? 'border-t-slate-800' : 'border-t-white'}`}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const columns = ['Todo', 'Task', 'UAT', 'Prod'];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className={`flex flex-col sm:flex-row min-h-screen w-full font-sans relative transition-colors duration-300 pb-16 sm:pb-0 ${isDarkMode ? 'bg-slate-950 text-slate-200' : 'bg-slate-50 text-slate-800'}`}&gt;</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{isSyncing &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className={`fixed inset-0 backdrop-blur-sm z-50 flex flex-col items-center justify-center ${isDarkMode ? 'bg-slate-950/80' : 'bg-white/80'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p className={`font-medium text-sm sm:text-base ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}&gt;กำลังประมวลผลข้อมูลจากระบบ...&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{toastMessage &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 animate-bounce ${isDarkMode ? 'bg-slate-800 text-white border border-slate-700' : 'bg-slate-800 text-white'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;CheckCircle size={20} className="text-green-400 shrink-0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span className="font-medium text-xs sm:text-sm"&gt;{toastMessage}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className={`fixed bottom-0 left-0 right-0 sm:relative sm:w-16 xl:w-64 flex flex-row sm:flex-col items-center xl:items-start py-2 sm:py-4 shadow-[0_-5px_15px_-3px_rgba(0,0,0,0.1)] sm:shadow-xl z-50 shrink-0 transition-all duration-300 sm:sticky sm:top-0 sm:h-screen ${isDarkMode ? 'bg-slate-900 border-t sm:border-t-0 sm:border-r border-slate-800 text-slate-300' : 'bg-slate-900 text-white'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="hidden sm:flex items-center justify-center xl:justify-start w-full px-4 mb-8 mt-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="bg-blue-600 p-2 rounded-lg shrink-0"&gt;&lt;LayoutDashboard size={20} className="text-white"/&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span className="ml-3 font-bold text-lg hidden xl:block truncate text-white"&gt;DashBoard&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;nav className="w-full flex flex-row sm:flex-col justify-around sm:justify-start gap-1 sm:gap-2 px-2 xl:px-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>onClick={() =&gt; setActiveMenu('overview')}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>className={`flex-1 sm:flex-none w-full flex flex-col sm:flex-row items-center justify-center xl:justify-start p-2 sm:p-2.5 xl:p-3 rounded-xl transition-colors border outline-none ${activeMenu === 'overview' ? (isDarkMode ? 'bg-slate-800/80 text-blue-400 border-slate-700' : 'bg-slate-800 text-blue-400 border-slate-700') : (isDarkMode ? 'border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-white' : 'border-transparent text-slate-400 hover:bg-slate-800 hover:text-white')}`}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;LayoutDashboard size={20} className="shrink-0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="mt-1 sm:mt-0 sm:ml-3 font-medium text-[10px] sm:text-sm sm:hidden xl:block"&gt;ภาพรวม&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/button&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>onClick={() =&gt; setActiveMenu('meeting')}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>className={`flex-1 sm:flex-none w-full flex flex-col sm:flex-row items-center justify-center xl:justify-start p-2 sm:p-2.5 xl:p-3 rounded-xl transition-colors border outline-none ${activeMenu === 'meeting' ? (isDarkMode ? 'bg-slate-800/80 text-blue-400 border-slate-700' : 'bg-slate-800 text-blue-400 border-slate-700') : (isDarkMode ? 'border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-white' : 'border-transparent text-slate-400 hover:bg-slate-800 hover:text-white')}`}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;CalendarDays size={20} className="shrink-0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="mt-1 sm:mt-0 sm:ml-3 font-medium text-[10px] sm:text-sm sm:hidden xl:block"&gt;Meeting&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>onClick={() =&gt; setActiveMenu('defect')}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>className={`flex-1 sm:flex-none w-full flex flex-col sm:flex-row items-center justify-center xl:justify-start p-2 sm:p-2.5 xl:p-3 rounded-xl transition-colors border outline-none ${activeMenu === 'defect' ? (isDarkMode ? 'bg-slate-800/80 text-red-400 border-slate-700' : 'bg-red-50 text-red-600 border-red-200') : (isDarkMode ? 'border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-white' : 'border-transparent text-slate-400 hover:bg-slate-800 hover:text-white')}`}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;Bug size={20} className="shrink-0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="mt-1 sm:mt-0 sm:ml-3 font-medium text-[10px] sm:text-sm sm:hidden xl:block"&gt;Defect List&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button className={`flex-1 sm:flex-none w-full flex flex-col sm:flex-row items-center justify-center xl:justify-start p-2 sm:p-2.5 xl:p-3 sm:mt-4 rounded-xl transition-colors border border-transparent outline-none ${isDarkMode ? 'text-slate-400 hover:bg-slate-800/50 hover:text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;Settings size={20} className="shrink-0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span className="mt-1 sm:mt-0 sm:ml-3 font-medium text-[10px] sm:text-sm sm:hidden xl:block"&gt;ตั้งค่า&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/nav&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;header className={`h-14 sm:h-16 border-b flex items-center justify-between px-3 sm:px-4 xl:px-8 shrink-0 z-30 shadow-sm sticky top-0 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`flex items-center rounded-full px-3 sm:px-4 py-1 sm:py-1.5 w-32 sm:w-48 xl:w-64 border focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;Search size={14} className={`sm:w-4 sm:h-4 shrink-0 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="text" placeholder="ค้นหา..." className={`bg-transparent border-none focus:outline-none ml-1.5 sm:ml-2 text-xs sm:text-sm w-full ${isDarkMode ? 'text-slate-200 placeholder-slate-500' : 'text-slate-700'}`} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="flex items-center gap-2 sm:gap-3 xl:gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className={`items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border hidden md:flex ${isDarkMode ? 'text-green-400 bg-green-900/30 border-green-800/50' : 'text-green-600 bg-green-50 border-green-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 animate-pulse"&gt;&lt;/span&gt; Sync</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">              </span>onClick={() =&gt; setIsDarkMode(!isDarkMode)}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>className={`p-1.5 sm:p-2 rounded-full transition-colors flex items-center justify-center border ${isDarkMode ? 'bg-slate-800 text-amber-400 hover:bg-slate-700 border-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200'}`}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>title={isDarkMode ? "เปลี่ยนเป็นโหมดสว่าง" : "เปลี่ยนเป็นโหมดมืด"}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{isDarkMode ? &lt;Sun size={16} className="sm:w-4 sm:h-4" /&gt; : &lt;Moon size={16} className="sm:w-4 sm:h-4" /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button className={`p-1.5 sm:p-2 relative transition-colors rounded-full ${isDarkMode ? 'text-slate-400 hover:text-blue-400 hover:bg-slate-800' : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;Bell size={16} className="sm:w-4 sm:h-4" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className={`absolute top-1 right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full border ${isDarkMode ? 'border-slate-900' : 'border-white'}`}&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className={`flex items-center gap-2 sm:gap-3 border-l pl-2 sm:pl-3 xl:pl-4 ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 border ${isDarkMode ? 'bg-blue-900/40 text-blue-400 border-blue-800/50' : 'bg-blue-100 text-blue-600 border-blue-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;User size={14} className="sm:w-4 sm:h-4" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="hidden lg:block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p className={`text-xs sm:text-sm font-bold leading-none mb-1 ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;เจ้านาย&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider leading-none"&gt;Project Manager&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="p-3 sm:p-4 xl:p-6 flex flex-col gap-4 xl:gap-6 w-full max-w-full"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{activeMenu === 'overview' ? (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 sm:gap-4 shrink-0 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="w-full xl:w-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;h1 className={`text-lg sm:text-xl xl:text-2xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}&gt;สรุปความคืบหน้าโครงการ Alpha One 2026&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p className={`text-[10px] sm:text-xs xl:text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;ทำงานร่วมกันแบบเรียลไทม์ พร้อมบันทึกคลาวด์อัตโนมัติ&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex flex-wrap gap-2 w-full xl:w-auto items-center shrink-0 z-40"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={handleSyncFromGoogleSheet}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className={`shrink-0 flex items-center justify-center gap-1.5 sm:gap-2 px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-bold transition-colors shadow-sm border ${isDarkMode ? 'bg-green-900/40 border-green-800/50 text-green-400 hover:bg-green-900/60' : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;RefreshCw size={14} className={`sm:w-4 sm:h-4 ${isSyncing ? "animate-spin" : ""}`} /&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span&gt;ดึงจาก Sheet&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={handleShareLink}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className={`shrink-0 flex items-center justify-center gap-1.5 sm:gap-2 px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-bold transition-colors shadow-sm border ${isDarkMode ? 'bg-indigo-900/40 border-indigo-800/50 text-indigo-400 hover:bg-indigo-900/60' : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;Share2 size={14} className="sm:w-4 sm:h-4" /&gt; &lt;span&gt;แชร์ลิงก์&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="relative shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                      </span>onClick={() =&gt; setExportMenuOpen(prev =&gt; !prev)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-colors shadow-sm border ${isDarkMode ? 'bg-blue-600 border-blue-500 text-white hover:bg-blue-500' : 'bg-blue-600 border-blue-700 text-white hover:bg-blue-700 shadow-blue-200'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;Download size={14} className="sm:w-4 sm:h-4" /&gt; &lt;span&gt;ส่งออก&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{exportMenuOpen &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="fixed inset-0 z-40" onClick={() =&gt; setExportMenuOpen(false)}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`absolute right-0 top-full mt-2 w-32 rounded-xl shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>onClick={() =&gt; handleExport('xlsx', rawData, 'project_overview')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>className={`w-full text-left px-4 py-2.5 text-[11px] sm:text-sm font-medium transition-colors relative z-50 ${isDarkMode ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.xlsx</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>onClick={() =&gt; handleExport('csv', rawData, 'project_overview')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>className={`w-full text-left px-4 py-2.5 text-[11px] sm:text-sm font-medium transition-colors relative z-50 ${isDarkMode ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.csv</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-6 shrink-0 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="xl:col-span-5 flex flex-col gap-4 xl:gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="grid grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col justify-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;รวมทั้งหมด&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-white' : 'text-slate-800'}`}&gt;{totalTasks}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;รายการ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col justify-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;รอทดสอบ (UAT)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}&gt;{uatTasks}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;รายการ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col justify-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;กำลังดำเนินการ&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}&gt;{inProgressTasks}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;รายการ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col justify-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;Production&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}&gt;{completedTasks}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;รายการ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`p-4 xl:p-5 rounded-2xl border shadow-sm flex flex-col justify-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex justify-between items-end mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[11px] sm:text-xs xl:text-sm font-bold ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}&gt;ความสำเร็จโครงการ (Project Pipeline)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;h2 className={`text-base sm:text-lg xl:text-xl font-bold leading-none ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}&gt;{progressPercent}%&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`w-full h-2 sm:h-2.5 xl:h-3 rounded-full overflow-hidden ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="h-full bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`p-3 sm:p-4 xl:p-5 rounded-2xl border shadow-sm flex items-center gap-3 sm:gap-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-2 sm:p-2.5 rounded-xl hidden sm:block shrink-0 ${isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-50 text-blue-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;Filter size={18} className="sm:w-5 sm:h-5" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex-1 grid grid-cols-2 gap-2 sm:gap-3 xl:gap-4 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label className={`block text-[9px] sm:text-[10px] xl:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;เดือน (Month)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>className={`w-full text-[11px] sm:text-xs xl:text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none block p-1.5 sm:p-2 transition-all border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>value={filters.month}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>onChange={(e) =&gt; setFilters({...filters, month: e.target.value})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{monthOptions.map((m, idx) =&gt; &lt;option key={`ov-mo-${idx}`} value={m}&gt;{m === 'All' ? 'ทั้งหมด (All)' : m}&lt;/option&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label className={`block text-[9px] sm:text-[10px] xl:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;พื้นที่ (HQ/Branch)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>className={`w-full text-[11px] sm:text-xs xl:text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none block p-1.5 sm:p-2 transition-all border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>value={filters.area}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>onChange={(e) =&gt; setFilters({...filters, area: e.target.value})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{areaOptions.map((a, idx) =&gt; &lt;option key={`ov-ar-${idx}`} value={a}&gt;{a === 'All' ? 'ทั้งหมด (All)' : a}&lt;/option&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className={`xl:col-span-7 p-4 xl:p-5 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="flex justify-between items-center mb-3 xl:mb-4 shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 className={`font-bold text-base xl:text-lg ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;Burndown Chart&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex gap-3 xl:gap-4 text-xs xl:text-sm font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className={`flex items-center gap-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}&gt;&lt;div className={`w-2.5 h-2.5 rounded-full border-2 ${isDarkMode ? 'border-slate-500' : 'border-slate-300'}`}&gt;&lt;/div&gt; Ideal&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className={`flex items-center gap-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}&gt;&lt;div className="w-2.5 h-2.5 rounded-full bg-blue-600"&gt;&lt;/div&gt; Actual&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`flex-1 w-full rounded-xl border p-2 xl:p-4 min-h-[140px] xl:min-h-0 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50/50 border-slate-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{renderBurndownChart(filteredData, 'overview')}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex flex-col mt-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="mb-3 xl:mb-4 flex items-center justify-between shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;h3 className={`font-bold text-base xl:text-lg ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;Task Board&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span className={`text-xs xl:text-sm font-medium px-3 py-1 rounded-full ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-200/70 text-slate-600'}`}&gt;{filteredData.length} งานในบอร์ด&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex gap-4 xl:gap-6 overflow-x-auto xl:grid xl:grid-cols-4 pb-2 items-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{columns.map(status =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const columnTasks = filteredData.filter(t =&gt; t.BoardStatus === status);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const headerColors = isDarkMode ? {</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Todo': 'bg-slate-800 text-slate-300',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Task': 'bg-blue-900/40 text-blue-400',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'UAT': 'bg-purple-900/40 text-purple-400',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Prod': 'bg-green-900/40 text-green-400'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} : {</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Todo': 'bg-slate-200/80 text-slate-700',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Task': 'bg-blue-100 text-blue-700',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'UAT': 'bg-purple-100 text-purple-700',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Prod': 'bg-green-100 text-green-700'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>key={`ov-col-${status}`}<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>className={`flex flex-col rounded-2xl p-3 xl:p-4 border shadow-inner min-w-[280px] xl:min-w-0 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-100/70 border-slate-200'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onDragOver={handleDragOver}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onDrop={(e) =&gt; handleDrop(e, status)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="flex justify-between items-center mb-3 shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;h4 className={`font-bold text-xs xl:text-sm px-3 py-1 rounded-full ${headerColors[status]}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>{status === 'Task' ? 'In Progress' : status.toUpperCase()}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/h4&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;span className={`text-xs font-bold px-2 py-0.5 rounded-md shadow-sm border ${isDarkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-white text-slate-600 border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>{columnTasks.length}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="flex flex-col space-y-2.5 xl:space-y-3 pb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{columnTasks.map(task =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>key={`ov-task-${task.id}`}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>draggable</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>onDragStart={(e) =&gt; handleDragStart(e, task.id)}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>className={`p-3 xl:p-4 rounded-xl shadow-sm border cursor-grab active:cursor-grabbing transition-all group relative overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-md'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div className={`absolute left-0 top-0 bottom-0 w-1 ${task['Area']?.includes('BKK') ? 'bg-orange-400' : 'bg-blue-400'}`}&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                              </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div className="flex justify-between items-start mb-2 pl-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span className={`text-[9px] xl:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>{task['No']}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{task['Area'] &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;span className={`text-[9px] xl:text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${isDarkMode ? 'bg-blue-900/30 border-blue-800/50 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-700'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>{task['Area']}</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                              </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;h5 className={`font-semibold text-xs xl:text-sm mb-1 leading-snug transition-colors pl-2 line-clamp-3 ${isDarkMode ? 'text-slate-200 group-hover:text-blue-400' : 'text-slate-800 group-hover:text-blue-600'}`} title={task['Detail']}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{task['Detail'] || 'ไม่ระบุรายละเอียดงาน'}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/h5&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                              </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div className="flex flex-col gap-1.5 mt-2 pl-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="flex items-center gap-1.5 text-[10px] xl:text-[11px] font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;span className={`px-1.5 py-0.5 rounded border truncate w-full ${isDarkMode ? 'bg-indigo-900/30 border-indigo-800/50 text-indigo-400' : 'bg-indigo-50 border-indigo-100 text-indigo-600'}`} title={task['Task']}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>📁 {task['Task'] || 'ไม่มีหมวดหมู่'}</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                                </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className={`flex items-center justify-between gap-1.5 text-[10px] xl:text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;div className="flex items-center gap-1.5 min-w-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;LayoutDashboard size={12} className={isDarkMode ? 'text-slate-500 shrink-0' : 'text-slate-400 shrink-0'} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span className="truncate" title={task['Module']}&gt;{task['Module'] || 'ไม่มีโมดูล'}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                                  </span></p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>{/* ส่วนแสดงวันที่อ่านจาก Column N */}</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>{overviewColN &amp;&amp; task[overviewColN] &amp;&amp; task[overviewColN].toString().trim() !== '' &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="flex items-center gap-1 shrink-0 text-[9px] xl:text-[10px] font-medium opacity-80" title={`วันที่: ${task[overviewColN]}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                      </span>&lt;CalendarDays size={10} className={isDarkMode ? 'text-blue-400' : 'text-blue-600'} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                      </span>&lt;span&gt;{formatDateDDMMYYYY(task[overviewColN])}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>))}</p>
+<p class="p2"><span class="Apple-converted-space">                          </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{columnTasks.length === 0 &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className={`h-20 xl:h-24 border-2 border-dashed rounded-xl flex items-center justify-center text-xs xl:text-sm font-medium ${isDarkMode ? 'border-slate-800 bg-slate-900/30 text-slate-600' : 'border-slate-300 bg-slate-50/50 text-slate-400'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>ลากวางที่นี่</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>) : activeMenu === 'meeting' ? (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex flex-col gap-3 sm:gap-4 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;h1 className={`text-lg sm:text-xl xl:text-2xl font-bold leading-tight flex items-center gap-2 sm:gap-3 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;CalendarDays className={`w-5 h-5 sm:w-6 sm:h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} /&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>รอบการประชุมและปฏิบัติการรายสัปดาห์</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p className={`text-[10px] sm:text-xs xl:text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;โครงสร้างแผนงานระหว่างทีม Tech, PM, User และ Helpdesk ประจำสัปดาห์&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;MeetingCycleDashboard isDarkMode={isDarkMode} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>) : activeMenu === 'defect' ? (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 sm:gap-4 shrink-0 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="w-full xl:w-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;h1 className={`text-lg sm:text-xl xl:text-2xl font-bold leading-tight flex items-center gap-2 sm:gap-3 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;Bug className={`w-5 h-5 sm:w-6 sm:h-6 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} /&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>สรุปความคืบหน้า Defect (Issue Tracking)</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p className={`text-[10px] sm:text-xs xl:text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;ติดตามและจัดการข้อบกพร่องของระบบ (อัปเดตจาก Sheet: Defect All)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex flex-wrap gap-2 w-full xl:w-auto items-center shrink-0 z-40"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={handleSyncFromGoogleSheet}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className={`shrink-0 flex items-center justify-center gap-1.5 sm:gap-2 px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-bold transition-colors shadow-sm border ${isDarkMode ? 'bg-green-900/40 border-green-800/50 text-green-400 hover:bg-green-900/60' : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;RefreshCw size={14} className={`sm:w-4 sm:h-4 ${isSyncing ? "animate-spin" : ""}`} /&gt;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span&gt;ดึงจาก Sheet&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={handleShareLink}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className={`shrink-0 flex items-center justify-center gap-1.5 sm:gap-2 px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-bold transition-colors shadow-sm border ${isDarkMode ? 'bg-indigo-900/40 border-indigo-800/50 text-indigo-400 hover:bg-indigo-900/60' : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;Share2 size={14} className="sm:w-4 sm:h-4" /&gt; &lt;span&gt;แชร์ลิงก์&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="relative shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                      </span>onClick={() =&gt; setExportMenuOpen(prev =&gt; !prev)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-colors shadow-sm border ${isDarkMode ? 'bg-blue-600 border-blue-500 text-white hover:bg-blue-500' : 'bg-blue-600 border-blue-700 text-white hover:bg-blue-700 shadow-blue-200'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;Download size={14} className="sm:w-4 sm:h-4" /&gt; &lt;span&gt;ส่งออก&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{exportMenuOpen &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="fixed inset-0 z-40" onClick={() =&gt; setExportMenuOpen(false)}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`absolute right-0 top-full mt-2 w-32 rounded-xl shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>onClick={() =&gt; handleExport('xlsx', defectData, 'defect_tracking')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>className={`w-full text-left px-4 py-2.5 text-[11px] sm:text-sm font-medium transition-colors relative z-50 ${isDarkMode ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.xlsx</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>onClick={() =&gt; handleExport('csv', defectData, 'defect_tracking')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>className={`w-full text-left px-4 py-2.5 text-[11px] sm:text-sm font-medium transition-colors relative z-50 ${isDarkMode ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-100'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.csv</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-6 shrink-0 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="xl:col-span-5 flex flex-col gap-4 xl:gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="grid grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;Defect ทั้งหมด&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5 mt-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-white' : 'text-slate-800'}`}&gt;{defectTotalCount}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;ข้อ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;BKK&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}&gt;{defectBkkCount}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;ข้อ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex flex-wrap gap-2 mt-auto pt-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-[10px] xl:text-[11px] font-bold shadow-sm ${isDarkMode ? 'bg-green-500/10 border-green-500/40 text-green-400' : 'bg-green-50 border-green-500 text-green-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"&gt;&lt;path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>เสร็จ: {defectBkkDone}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-[10px] xl:text-[11px] font-bold shadow-sm ${isDarkMode ? 'bg-red-500/10 border-red-500/40 text-red-400' : 'bg-red-50 border-red-500 text-red-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"&gt;&lt;path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>เหลือ: {defectBkkPending}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;Branch&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}&gt;{defectBranchCount}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;ข้อ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex flex-wrap gap-2 mt-auto pt-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-[10px] xl:text-[11px] font-bold shadow-sm ${isDarkMode ? 'bg-green-500/10 border-green-500/40 text-green-400' : 'bg-green-50 border-green-500 text-green-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"&gt;&lt;path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>เสร็จ: {defectBranchDone}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-[10px] xl:text-[11px] font-bold shadow-sm ${isDarkMode ? 'bg-red-500/10 border-red-500/40 text-red-400' : 'bg-red-50 border-red-500 text-red-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"&gt;&lt;path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>เหลือ: {defectBranchPending}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-3 xl:p-4 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[10px] xl:text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;Production&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex items-end gap-1.5 mt-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 className={`text-2xl xl:text-3xl font-bold leading-none ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}&gt;{defectProductionCount}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span className={`text-[10px] xl:text-xs mb-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}&gt;ข้อ&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`p-4 xl:p-5 rounded-2xl border shadow-sm flex flex-col justify-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex justify-between items-end mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-[11px] sm:text-xs xl:text-sm font-bold ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}&gt;ความสำเร็จโครงการ (Project Pipeline)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;h2 className={`text-base sm:text-lg xl:text-xl font-bold leading-none ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}&gt;{defectProgressPercent}%&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`w-full h-2 sm:h-2.5 xl:h-3 rounded-full overflow-hidden ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="h-full bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${defectProgressPercent}%` }}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`p-3 sm:p-4 xl:p-5 rounded-2xl border shadow-sm flex items-center gap-3 sm:gap-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`p-2 sm:p-2.5 rounded-xl hidden sm:block shrink-0 ${isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-50 text-blue-600'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;Filter size={18} className="sm:w-5 sm:h-5" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex-1 grid grid-cols-2 gap-2 sm:gap-3 xl:gap-4 w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label className={`block text-[9px] sm:text-[10px] xl:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;เดือน (Month)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>className={`w-full text-[11px] sm:text-xs xl:text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none block p-1.5 sm:p-2 transition-all border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>value={defectFilters.month}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>onChange={(e) =&gt; setDefectFilters({...defectFilters, month: e.target.value})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{defectMonthOptions.map((m, idx) =&gt; &lt;option key={`def-mo-${idx}`} value={m}&gt;{m === 'All' ? 'ทั้งหมด (All)' : m}&lt;/option&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label className={`block text-[9px] sm:text-[10px] xl:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;พื้นที่ (HQ/Branch)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>className={`w-full text-[11px] sm:text-xs xl:text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none block p-1.5 sm:p-2 transition-all border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>value={defectFilters.area}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>onChange={(e) =&gt; setDefectFilters({...defectFilters, area: e.target.value})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{defectAreaOptions.map((a, idx) =&gt; &lt;option key={`def-ar-${idx}`} value={a}&gt;{a === 'All' ? 'ทั้งหมด (All)' : a}&lt;/option&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className={`xl:col-span-7 p-4 xl:p-5 rounded-2xl border shadow-sm flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="flex justify-between items-center mb-3 xl:mb-4 shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 className={`font-bold text-base xl:text-lg ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;Burndown Chart&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex gap-3 xl:gap-4 text-xs xl:text-sm font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className={`flex items-center gap-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}&gt;&lt;div className={`w-2.5 h-2.5 rounded-full border-2 ${isDarkMode ? 'border-slate-500' : 'border-slate-300'}`}&gt;&lt;/div&gt; Ideal&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className={`flex items-center gap-1.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}&gt;&lt;div className="w-2.5 h-2.5 rounded-full bg-blue-600"&gt;&lt;/div&gt; Actual&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className={`flex-1 w-full rounded-xl border p-2 xl:p-4 min-h-[140px] xl:min-h-0 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50/50 border-slate-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{renderBurndownChart(filteredDefectData, 'defect')}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex flex-col mt-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="mb-3 xl:mb-4 flex items-center justify-between shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;h3 className={`font-bold text-base xl:text-lg ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}&gt;Task Board (Defects)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span className={`text-xs xl:text-sm font-medium px-3 py-1 rounded-full ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-200/70 text-slate-600'}`}&gt;{filteredDefectData.length} งานในบอร์ด&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex gap-4 xl:gap-6 overflow-x-auto xl:grid xl:grid-cols-4 pb-2 items-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{columns.map(status =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const columnTasks = filteredDefectData.filter(t =&gt; t.BoardStatus === status);</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const headerColors = isDarkMode ? {</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Todo': 'bg-slate-800 text-slate-300',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Task': 'bg-blue-900/40 text-blue-400',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'UAT': 'bg-purple-900/40 text-purple-400',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Prod': 'bg-green-900/40 text-green-400'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} : {</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Todo': 'bg-slate-200/80 text-slate-700',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Task': 'bg-blue-100 text-blue-700',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'UAT': 'bg-purple-100 text-purple-700',</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>'Prod': 'bg-green-100 text-green-700'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>key={`def-col-${status}`}<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>className={`flex flex-col rounded-2xl p-3 xl:p-4 border shadow-inner min-w-[280px] xl:min-w-0 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-100/70 border-slate-200'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onDragOver={handleDragOver}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onDrop={(e) =&gt; handleDefectDrop(e, status)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="flex justify-between items-center mb-3 shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;h4 className={`font-bold text-xs xl:text-sm px-3 py-1 rounded-full ${headerColors[status]}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>{status === 'Todo' ? 'TODO' : status === 'Task' ? 'IN PROGRESS' : status === 'UAT' ? 'RETEST' : 'DONE'}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/h4&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;span className={`text-xs font-bold px-2 py-0.5 rounded-md shadow-sm border ${isDarkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-white text-slate-600 border-slate-200'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>{columnTasks.length}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="flex flex-col space-y-2.5 xl:space-y-3 pb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{columnTasks.map(task =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>key={`def-task-${task.id}`}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>draggable</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>onDragStart={(e) =&gt; handleDragStart(e, task.id)}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>className={`p-3 xl:p-4 rounded-xl shadow-sm border cursor-grab active:cursor-grabbing transition-all group relative overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-md'}`}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div className={`absolute left-0 top-0 bottom-0 w-1 ${task['Priority']?.toLowerCase().includes('high') ? 'bg-red-500' : (task['Area']?.includes('BKK') ? 'bg-orange-400' : 'bg-blue-400')}`}&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                              </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div className="flex justify-between items-start mb-2 pl-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span className={`text-[9px] xl:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>{colA &amp;&amp; task[colA] ? task[colA] : (task['No'] || task['Issue ID'] || 'Defect')}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{task['Area'] &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;span className={`text-[9px] xl:text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${isDarkMode ? 'bg-blue-900/30 border-blue-800/50 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-700'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>{task['Area']}</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                              </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;h5 className={`font-semibold text-xs xl:text-sm mb-1 leading-snug transition-colors pl-2 line-clamp-3 ${isDarkMode ? 'text-slate-200 group-hover:text-blue-400' : 'text-slate-800 group-hover:text-blue-600'}`} title={task['Details'] || task['Detail']}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{task['Details'] || task['Detail'] || 'ไม่ระบุรายละเอียดปัญหา'}</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/h5&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                              </span></p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;div className="flex flex-col gap-1.5 mt-2 pl-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="flex items-center gap-1.5 text-[10px] xl:text-[11px] font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;span className={`px-1.5 py-0.5 rounded border truncate w-full ${isDarkMode ? 'bg-indigo-900/30 border-indigo-800/50 text-indigo-400' : 'bg-indigo-50 border-indigo-100 text-indigo-600'}`} title={task['System'] || task['Task']}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>📁 {task['System'] || task['Task'] || 'ไม่มีหมวดหมู่/ระบบ'}</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                                </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className={`flex items-center gap-1.5 text-[10px] xl:text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;LayoutDashboard size={12} className={isDarkMode ? 'text-slate-500 shrink-0' : 'text-slate-400 shrink-0'} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                  </span>&lt;span className="truncate" title={task['Module']}&gt;{task['Module'] || 'ไม่มีโมดูล'}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>))}</p>
+<p class="p2"><span class="Apple-converted-space">                          </span></p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{columnTasks.length === 0 &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className={`h-20 xl:h-24 border-2 border-dashed rounded-xl flex items-center justify-center text-xs xl:text-sm font-medium ${isDarkMode ? 'border-slate-800 bg-slate-900/30 text-slate-600' : 'border-slate-300 bg-slate-50/50 text-slate-400'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>ลากวางที่นี่</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>) : null}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{/* Footer Copyright */}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className={`mt-auto pt-8 pb-2 text-[10px] sm:text-xs font-medium tracking-wide ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Copyright &amp;copy; 2026 Process Optimization</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+</body>
+</html>

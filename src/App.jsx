@@ -538,6 +538,9 @@ const overviewMonthColName = rawData.length > 0 && Object.keys(rawData[0]).lengt
 // อ่านชื่อหัวคอลัมน์ N (Index 13) เพื่อนำมาใช้อ้างอิงดึงข้อมูลวันที่
 const overviewColN = rawData.length > 0 && Object.keys(rawData[0]).length > 13 ? Object.keys(rawData[0])[13] : null;
 
+// อ่านชื่อหัวคอลัมน์ A (Index 0) สำหรับ Task No.
+const mainColA = rawData.length > 0 ? Object.keys(rawData[0])[0] : null;
+
 // ฟังก์ชันจัดฟอร์แมตวันที่ให้เป็น dd/mm/yyyy เสมอ
 const formatDateDDMMYYYY = (dateStr) => {
 if (!dateStr || String(dateStr).trim() === '' || String(dateStr).trim() === '-') return '';
@@ -1143,7 +1146,7 @@ className={`p-3 xl:p-4 rounded-xl shadow-sm border cursor-grab active:cursor-gra
 
 <div className="flex justify-between items-start mb-2 pl-2">
 <span className={`text-[9px] xl:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}>
-{task['No']}
+{mainColA && task[mainColA] ? task[mainColA] : task['No']}
 </span>
 {task['Area'] && (
 <span className={`text-[9px] xl:text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${isDarkMode ? 'bg-blue-900/30 border-blue-800/50 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>

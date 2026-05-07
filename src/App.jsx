@@ -314,7 +314,7 @@ const [toastMessage, setToastMessage] = useState('');
 const [hoveredPoint, setHoveredPoint] = useState(null);
 const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
-const [isDarkMode, setIsDarkMode] = useState(true);
+const [isDarkMode, setIsDarkMode] = useState(false);
 const [user, setUser] = useState(null);
 const [isSyncing, setIsSyncing] = useState(true);
 

@@ -265,8 +265,10 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
 };
 
 // --- Roadmap Dashboard Component ---
-const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '' }) => {
+const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly = false }) => {
  const [selectedTask, setSelectedTask] = useState(null);
+ const [statusFilter, setStatusFilter] = useState(null);
+ const statusLabels = { prod: 'Done', task: 'In Progress', uat: 'UAT', todo: 'Not Start' };
  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
  const quarters = [
  { name: 'Q1', span: 3 },
@@ -502,9 +504,22 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '' }) => {
  }, [data, searchQuery]);
 
  // คำนวณสถิติจำนวนงานแยกตามสี (สถานะ) เพื่อนำไปแสดงในแถบ Legend
+ const displayedCategories = useMemo(() => {
+ let filtered = categoriesToRender;
+ if (showBenefitOnly) {
+ filtered = filtered
+ .map(cat => ({ ...cat, tasks: cat.tasks.filter(task => task.benefit && task.benefit !== '-') }))
+ .filter(cat => cat.tasks.length > 0);
+ }
+ if (!statusFilter) return filtered;
+ return filtered
+ .map(cat => ({ ...cat, tasks: cat.tasks.filter(task => task.status === statusFilter) }))
+ .filter(cat => cat.tasks.length > 0);
+ }, [categoriesToRender, showBenefitOnly, statusFilter]);
+
  const stats = useMemo(() => {
  const counts = { prod: 0, task: 0, uat: 0, todo: 0 };
- categoriesToRender.forEach(cat => {
+ displayedCategories.forEach(cat => {
  if(cat.tasks) {
  cat.tasks.forEach(task => {
  counts[task.status] = (counts[task.status] || 0) + 1;
@@ -512,29 +527,38 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '' }) => {
  }
  });
  return counts;
- }, [categoriesToRender]);
+ }, [displayedCategories]);
 
  return (
  <div className="flex flex-col gap-3">
  {/* ข้อมูลสรุปสีต่างๆ (Legend & Stats) */}
  <div className="flex flex-wrap gap-2 md:gap-3 items-center">
- <div className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
- <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
- <span className="text-[10px] md:text-xs font-semibold">Done: {stats.prod}</span>
- </div>
- <div className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
- <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
- <span className="text-[10px] md:text-xs font-semibold">In Progress: {stats.task}</span>
- </div>
- <div className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-200 text-purple-700'}`}>
- <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
- <span className="text-[10px] md:text-xs font-semibold">UAT: {stats.uat}</span>
- </div>
- <div className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-zinc-500/10 border-zinc-500/20 text-zinc-400' : 'bg-zinc-50 border-zinc-200 text-zinc-700'}`}>
- <div className="w-2.5 h-2.5 rounded-full bg-zinc-400 md:bg-zinc-500"></div>
- <span className="text-[10px] md:text-xs font-semibold">Not Start: {stats.todo}</span>
- </div>
- <div className="ml-auto">
+ {['prod', 'task', 'uat', 'todo'].map((statusKey, index) => {
+ const colors = {
+ prod: isDarkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700',
+ task: isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700',
+ uat: isDarkMode ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-200 text-purple-700',
+ todo: isDarkMode ? 'bg-zinc-500/10 border-zinc-500/20 text-zinc-400' : 'bg-zinc-50 border-zinc-200 text-zinc-700'
+ };
+ const active = statusFilter === statusKey;
+ return (
+ <button
+ key={statusKey}
+ type="button"
+ onClick={() => setStatusFilter(prev => prev === statusKey ? null : statusKey)}
+ className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm transition ${colors[statusKey]} ${active ? 'ring-2 ring-offset-1 ring-blue-400' : ''}`}
+ >
+ <div className={`w-2.5 h-2.5 rounded-full ${statusKey === 'prod' ? 'bg-emerald-500' : statusKey === 'task' ? 'bg-blue-500' : statusKey === 'uat' ? 'bg-purple-500' : 'bg-zinc-400 md:bg-zinc-500'}`}></div>
+ <span className="text-[10px] md:text-xs font-semibold">{statusLabels[statusKey]}: {stats[statusKey]}</span>
+ </button>
+ );
+ })}
+ <div className="ml-auto flex items-center gap-2">
+ {statusFilter && (
+ <span className={`text-[10px] font-medium px-2 py-1 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
+ Filter: {statusLabels[statusFilter]}
+ </span>
+ )}
  <span className={`text-[10px] font-medium px-2 py-1 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
  Total: {stats.prod + stats.task + stats.uat + stats.todo} Tasks
  </span>
@@ -576,7 +600,7 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '' }) => {
  ))}
  </div>
 
- {categoriesToRender.map((cat, idx) => (
+ {displayedCategories.map((cat, idx) => (
  <div key={cat.id} className={`flex border-b last:border-b-0 ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
  {/* Category Sidebar */}
  <div 
@@ -764,6 +788,7 @@ export default function App() {
  const [roadmapData, setRoadmapData] = useState([]);
  const [isSyncingRoadmap, setIsSyncingRoadmap] = useState(false);
  const [roadmapViewMode, setRoadmapViewMode] = useState('synced'); // เปลี่ยนค่าเริ่มต้นเป็นโหมด 'synced'
+ const [roadmapShowBenefitOnly, setRoadmapShowBenefitOnly] = useState(false);
 
  const [isDarkMode, setIsDarkMode] = useState(false);
  const [user, setUser] = useState(null);
@@ -1746,6 +1771,13 @@ export default function App() {
  </button>
  </div>
 
+ <button
+ onClick={() => setRoadmapShowBenefitOnly(prev => !prev)}
+ className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${roadmapShowBenefitOnly ? (isDarkMode ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-600 text-white shadow-sm') : (isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-700')}`}
+ >
+ <Target size={14} /> Benefit
+ </button>
+
  <button 
  onClick={() => fetchRoadmapFromSheet(true)} 
  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-700'}`}
@@ -1775,7 +1807,7 @@ export default function App() {
  </div>
  
  {/* ส่งข้อมูล data เข้าไปเฉพาะตอนที่เลือกโหมด 'synced' เท่านั้น */}
- <RoadmapDashboard isDarkMode={isDarkMode} data={roadmapViewMode === 'synced' ? roadmapData : null} searchQuery={searchQuery} />
+ <RoadmapDashboard isDarkMode={isDarkMode} data={roadmapViewMode === 'synced' ? roadmapData : null} searchQuery={searchQuery} showBenefitOnly={roadmapShowBenefitOnly} />
  </>
  ) : activeMenu === 'meeting' ? (
  <div className="flex flex-col gap-4 w-full">

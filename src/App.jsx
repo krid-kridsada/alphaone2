@@ -300,11 +300,11 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  tasks: [
  { no: '1', name: 'รายละเอียดงานเพิ่มเติม on alphaone', month: 'ม.ค.', benefit: 'เพิ่มความชัดเจน', status: 'prod', start: 1, end: 2 }, 
  { no: '6', name: 'Call Gateway', month: 'มิ.ย.', benefit: 'รองรับลูกค้าเพิ่ม', status: 'task', start: 11, end: 12 },
- { no: '2', name: 'การแก้ไขข้อมูลลูกค้า by MSG', month: 'ม.ค.', benefit: '-', status: 'prod', start: 1, end: 2 }, 
+ { no: '2', name: 'การแก้ไขข้อมูลลูกค้า by MSG', month: 'ม.ค.', benefit: 'อัปเดตข้อมูลลูกค้า', status: 'prod', start: 1, end: 2 }, 
  { no: '7', name: 'Blog บทความข่าวสาร', month: 'ต.ค.', benefit: 'เพิ่มยอดเข้าชม', status: 'todo', start: 19, end: 20 },
  { no: '3', name: 'Messenger Chat', month: 'พ.ค.', benefit: 'ลดเวลาตอบกลับ', status: 'uat', start: 9, end: 10 },
  { no: '4', name: 'Login / session timeout', month: 'พ.ค.', benefit: 'เพิ่มความปลอดภัย', status: 'task', start: 9, end: 10 },
- { no: '5', name: 'User management', month: 'พ.ค.', benefit: '-', status: 'todo', start: 9, end: 10 }
+ { no: '5', name: 'User management', month: 'พ.ค.', benefit: 'จัดการผู้ใช้งานอย่างมีประสิทธิภาพ', status: 'todo', start: 9, end: 10 }
  ]
  },
  {
@@ -312,10 +312,10 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  title: 'Document Delivery',
  tasks: [
  { no: '8', name: 'ระบบจัดการเอกสารนำกลับ', month: 'ก.พ.', benefit: 'ลดกระดาษ 20%', status: 'prod', start: 3, end: 4 }, 
- { no: '13', name: 'มีระบบการออกใบสั่งงานนิติบุคคล', month: 'มิ.ย.', benefit: '-', status: 'task', start: 11, end: 12 },
- { no: '9', name: 'ฟังก์ชั่นจ่ายงาน & จ่ายงานล่วงหน้า', month: 'ก.พ.', benefit: '-', status: 'uat', start: 3, end: 4 },
+ { no: '13', name: 'มีระบบการออกใบสั่งงานนิติบุคคล', month: 'มิ.ย.', benefit: 'ออกใบสั่งงานอัตโนมัติ', status: 'task', start: 11, end: 12 },
+ { no: '9', name: 'ฟังก์ชั่นจ่ายงาน & จ่ายงานล่วงหน้า', month: 'ก.พ.', benefit: 'ลดเวลาการจ่ายงาน', status: 'uat', start: 3, end: 4 },
  { no: '10', name: 'จัดการงานเลื่อน', month: 'ก.พ.', benefit: 'ลดงานค้าง 15%', status: 'prod', start: 3, end: 4 },
- { no: '11', name: 'หน้าตรวจงานสิ้นวัน (1.2,1.4)', month: 'มี.ค.', benefit: '-', status: 'todo', start: 5, end: 6 },
+ { no: '11', name: 'หน้าตรวจงานสิ้นวัน (1.2,1.4)', month: 'มี.ค.', benefit: 'ตรวจสอบงานสิ้นวัน', status: 'todo', start: 5, end: 6 },
  { no: '12', name: 'Ai Smart Tools Photo-Inspection', month: 'ก.พ.', benefit: 'เพิ่มความแม่นยำ AI', status: 'task', start: 3, end: 4 }
  ]
  },
@@ -325,7 +325,7 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  tasks: [
  { no: '14', name: 'NPS (13)', month: 'ก.พ.', benefit: 'วัดผลความพึงพอใจ', status: 'prod', start: 3, end: 4 }, 
  { no: '16', name: 'Payment Gateway', month: 'มิ.ย.', benefit: 'จ่ายเงินง่ายขึ้น', status: 'uat', start: 11, end: 12 },
- { no: '15', name: 'Report', month: 'มิ.ย.', benefit: '-', status: 'todo', start: 11, end: 12 }
+ { no: '15', name: 'Report', month: 'มิ.ย.', benefit: 'รายงานผลการทำงาน', status: 'todo', start: 11, end: 12 }
  ]
  }
  ];
@@ -1755,8 +1755,8 @@ export default function App() {
  
  <div className="flex flex-wrap gap-2 w-full md:w-auto items-center">
  
- {/* Toggle Switch สลับโหมด */}
- <div className={`flex items-center p-0.5 rounded-lg border mr-1 md:mr-2 ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+ {/* Toggle Switch สลับโหมด - Hidden */}
+ <div className={`hidden flex items-center p-0.5 rounded-lg border mr-1 md:mr-2 ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
  <button 
  onClick={() => setRoadmapViewMode('current')} 
  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${roadmapViewMode === 'current' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-sm' : 'bg-white text-zinc-900 shadow-sm') : (isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-700')}`}

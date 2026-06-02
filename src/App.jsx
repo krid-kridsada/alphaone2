@@ -277,6 +277,20 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  { name: 'Q4', span: 3 },
  ];
 
+ const formatDateDisplay = (dateStr) => {
+	 if (!dateStr || String(dateStr).trim() === '' || String(dateStr).trim() === '-') return '';
+	 const s = String(dateStr).trim();
+	 const d = new Date(s);
+	 if (!isNaN(d.getTime())) {
+		 const dd = String(d.getDate()).padStart(2, '0');
+		 const mm = String(d.getMonth() + 1).padStart(2, '0');
+		 const yyyy = d.getFullYear();
+		 return `${dd}/${mm}/${yyyy}`;
+	 }
+	 // fallback: return original string
+	 return s;
+ };
+
  // ฟังก์ชันตัวช่วยสำหรับกำหนดสีของการ์ดแต่ละใบตามสถานะ
  const getTaskTheme = (status, isDark) => {
  if (isDark) {
@@ -360,6 +374,8 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  const colF_key = allKeys.length > 5 ? allKeys[5] : null;  // F: Thumb name
  const colJ_key = allKeys.length > 9 ? allKeys[9] : null;  // J: Month
  const colL_key = allKeys.length > 11 ? allKeys[11] : null; // L: Status
+ const colN_key = allKeys.length > 13 ? allKeys[13] : null; // N: UAT Date
+ const colO_key = allKeys.length > 14 ? allKeys[14] : null; // O: Prod Date
  const colV_key = allKeys.length > 21 ? allKeys[21] : null; // V: Benefit
  const colW_key = allKeys.length > 22 ? allKeys[22] : null; // W: Category
  const colX_key = allKeys.length > 23 ? allKeys[23] : null; // X: Sprint
@@ -441,7 +457,9 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  benefit: benefitVal, 
  status: parsedStatus, 
  start: startCol, 
- end: startCol + 1 
+ end: startCol + 1,
+ uat: colN_key && item[colN_key] ? String(item[colN_key]).trim() : '',
+ prod: colO_key && item[colO_key] ? String(item[colO_key]).trim() : ''
  });
  }
  });
@@ -747,6 +765,28 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{selectedTask.benefit && selectedTask.benefit !== '-' ? selectedTask.benefit : 'ไม่ได้ระบุ'}</p>
  </div>
  </div>
+
+ <div className={`flex items-stretch gap-4 mt-2`}> 
+ <div className={`flex-1 flex items-center gap-4 p-4 rounded-xl border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div className={`p-2.5 rounded-lg`} style={{ background: selectedTask.tTheme.bg, color: selectedTask.tTheme.text }}>
+ <CalendarDays size={20} />
+ </div>
+ <div>
+ <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>UAT Date</p>
+ <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{formatDateDisplay(selectedTask.uat) || 'ไม่ได้ระบุ'}</p>
+ </div>
+ </div>
+
+ <div className={`flex-1 flex items-center gap-4 p-4 rounded-xl border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div className={`p-2.5 rounded-lg`} style={{ background: selectedTask.tTheme.bg, color: selectedTask.tTheme.text }}>
+ <CalendarDays size={20} />
+ </div>
+ <div>
+ <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Prod Date</p>
+ <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{formatDateDisplay(selectedTask.prod) || 'ไม่ได้ระบุ'}</p>
+ </div>
+ </div>
+ </div>
  </div>
 
  <div className="mt-8 pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
@@ -765,6 +805,62 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  );
 };
 
+// Reusable UI-only multiselect dropdown (no external deps)
+const MultiSelectDropdown = ({ options = [], value = [], onChange = () => {}, placeholder = 'Select', isDarkMode = false }) => {
+	const [open, setOpen] = useState(false);
+	const ref = useRef(null);
+
+	useEffect(() => {
+		const onDoc = (e) => {
+			if (!ref.current) return;
+			if (!ref.current.contains(e.target)) setOpen(false);
+		};
+		document.addEventListener('click', onDoc);
+		return () => document.removeEventListener('click', onDoc);
+	}, []);
+
+	const toggleOption = (opt) => {
+		let next = Array.isArray(value) ? [...value] : [];
+		if (opt === 'All') {
+			next = ['All'];
+			onChange(next);
+			return;
+		}
+		const hasAll = next.includes('All');
+		if (hasAll) next = [];
+		const idx = next.indexOf(opt);
+		if (idx === -1) next.push(opt); else next.splice(idx, 1);
+		if (next.length === 0) next = ['All'];
+		onChange(next);
+	};
+
+	const isSelected = (opt) => Array.isArray(value) && value.includes(opt);
+
+	return (
+		<div className="relative" ref={ref}>
+			<button type="button" onClick={() => setOpen(prev => !prev)} className={`w-full text-left px-3 py-1.5 rounded-md border flex items-center justify-between gap-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-700'}`}>
+				<div className="flex-1 truncate text-sm">
+					{Array.isArray(value) && value.length > 0 ? (value.includes('All') ? 'All' : value.join(', ')) : placeholder}
+				</div>
+				<div className="text-xs text-zinc-400">▾</div>
+			</button>
+
+			{open && (
+				<div className={`absolute mt-2 right-0 left-0 z-50 rounded-md shadow-xl border overflow-auto max-h-56 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+					<div className="p-2">
+						{options.map((opt, i) => (
+							<label key={`opt-${i}`} className="flex items-center gap-2 p-2 rounded hover:bg-zinc-50 cursor-pointer" style={{display: 'flex'}}>
+								<input type="checkbox" checked={isSelected(opt)} onChange={() => toggleOption(opt)} />
+								<span className={`text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{opt === 'All' ? (opt) : opt}</span>
+							</label>
+						))}
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
+
 export default function App() {
  const [activeMenu, setActiveMenu] = useState('overview'); 
  const [searchQuery, setSearchQuery] = useState(''); // เพิ่มสเตทควบคุมช่องค้นหา
@@ -773,8 +869,8 @@ export default function App() {
  const [headers, setHeaders] = useState([]);
  const [defectData, setDefectData] = useState([]); 
  
- const [filters, setFilters] = useState({ month: 'All', area: 'All' });
- const [defectFilters, setDefectFilters] = useState({ month: 'All', area: 'All' });
+ const [filters, setFilters] = useState({ month: ['All'], area: ['All'] });
+ const [defectFilters, setDefectFilters] = useState({ month: ['All'], area: ['All'] });
  
  const [toastMessage, setToastMessage] = useState('');
  const [exportMenuOpen, setExportMenuOpen] = useState(false); 
@@ -1068,14 +1164,19 @@ export default function App() {
  : 'Revise Estimate Deliver';
 
  const overviewColN = rawData.length > 0 && Object.keys(rawData[0]).length > 13 ? Object.keys(rawData[0])[13] : null;
+ const overviewColO = rawData.length > 0 && Object.keys(rawData[0]).length > 14 ? Object.keys(rawData[0])[14] : null;
 
  const overviewKeys = rawData.length > 0 ? Object.keys(rawData[0]) : [];
  const overviewColA = overviewKeys.length > 0 ? overviewKeys[0] : null;
 
  const filteredData = useMemo(() => {
  return rawData.filter(item => {
- const matchMonth = filters.month === 'All' || item[overviewMonthColName] === filters.month;
- const matchArea = filters.area === 'All' || item['Area'] === filters.area;
+ const itemMonth = String(item[overviewMonthColName] || '').trim();
+ const itemArea = String(item['Area'] || '').trim();
+ const selectedMonths = Array.isArray(filters.month) ? filters.month : [filters.month];
+ const selectedAreas = Array.isArray(filters.area) ? filters.area : [filters.area];
+ const matchMonth = selectedMonths.includes('All') || (itemMonth !== '' && selectedMonths.includes(itemMonth));
+ const matchArea = selectedAreas.includes('All') || (itemArea !== '' && selectedAreas.includes(itemArea));
  const matchSearch = !searchQuery || Object.values(item).some(val => val && String(val).toLowerCase().includes(searchQuery.toLowerCase()));
  return matchMonth && matchArea && matchSearch;
  });
@@ -1108,8 +1209,12 @@ export default function App() {
  
  const filteredDefectData = useMemo(() => {
  return defectData.filter(item => {
- const matchMonth = defectFilters.month === 'All' || item[defectMonthColName] === defectFilters.month;
- const matchArea = defectFilters.area === 'All' || item[defectAreaColName] === defectFilters.area;
+ const itemMonth = String(item[defectMonthColName] || '').trim();
+ const itemArea = String(item[defectAreaColName] || '').trim();
+ const selectedMonths = Array.isArray(defectFilters.month) ? defectFilters.month : [defectFilters.month];
+ const selectedAreas = Array.isArray(defectFilters.area) ? defectFilters.area : [defectFilters.area];
+ const matchMonth = selectedMonths.includes('All') || (itemMonth !== '' && selectedMonths.includes(itemMonth));
+ const matchArea = selectedAreas.includes('All') || (itemArea !== '' && selectedAreas.includes(itemArea));
  const matchSearch = !searchQuery || Object.values(item).some(val => val && String(val).toLowerCase().includes(searchQuery.toLowerCase()));
  return matchMonth && matchArea && matchSearch;
  });
@@ -1540,14 +1645,10 @@ export default function App() {
  </div>
  <div className="grid grid-cols-2 gap-3">
  <div>
- <select className={`w-full text-xs rounded-md focus:outline-none block p-1.5 border appearance-none ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-200 text-zinc-700'}`} value={filters.month} onChange={(e) => setFilters({...filters, month: e.target.value})}>
- {monthOptions.map((m, idx) => <option key={`ov-mo-${idx}`} value={m}>{m === 'All' ? 'All Months' : m}</option>)}
- </select>
+ <MultiSelectDropdown options={monthOptions} value={filters.month} onChange={(selected) => setFilters({...filters, month: selected})} placeholder={'Months'} isDarkMode={isDarkMode} />
  </div>
  <div>
- <select className={`w-full text-xs rounded-md focus:outline-none block p-1.5 border appearance-none ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-200 text-zinc-700'}`} value={filters.area} onChange={(e) => setFilters({...filters, area: e.target.value})}>
- {areaOptions.map((a, idx) => <option key={`ov-ar-${idx}`} value={a}>{a === 'All' ? 'All Areas' : a}</option>)}
- </select>
+ <MultiSelectDropdown options={areaOptions} value={filters.area} onChange={(selected) => setFilters({...filters, area: selected})} placeholder={'Areas'} isDarkMode={isDarkMode} />
  </div>
  </div>
  </div>
@@ -1675,9 +1776,20 @@ export default function App() {
  <LayoutDashboard size={10} className="shrink-0" />
  <span className="truncate">{task['Module'] || 'No module'}</span>
  </div>
- {overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '' && (
- <div className="flex items-center gap-1 shrink-0 font-medium text-blue-500">
- <CalendarDays size={10} /><span>{formatDateDDMMYYYY(task[overviewColN])}</span>
+ {((overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '') || (overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '')) && (
+ <div className="flex flex-col items-end gap-1 shrink-0 min-w-[92px]">
+	 {overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '' && (
+		 <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+			 <CalendarDays size={12} />
+			 <span className="truncate">UAT: {formatDateDDMMYYYY(task[overviewColN])}</span>
+		 </div>
+	 )}
+	 {overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '' && (
+		 <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1 rounded-full bg-green-50 text-emerald-700 border border-green-100">
+			 <CalendarDays size={12} />
+			 <span className="truncate">Prod: {formatDateDDMMYYYY(task[overviewColO])}</span>
+		 </div>
+	 )}
  </div>
  )}
  </div>
@@ -1720,9 +1832,14 @@ export default function App() {
  {task['Area'] ? <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>{task['Area']}</span> : '-'}
  </td>
  <td className={`py-3 px-4 text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
- {overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '' ? (
- <div className="flex items-center gap-1 font-medium text-blue-500">
- <CalendarDays size={10} /><span>{formatDateDDMMYYYY(task[overviewColN])}</span>
+ {((overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '') || (overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '')) ? (
+ <div className="flex flex-col gap-1">
+ {overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '' && (
+ <div className="flex items-center gap-1 font-medium text-blue-500"><CalendarDays size={10} /><span>{formatDateDDMMYYYY(task[overviewColN])} (UAT)</span></div>
+ )}
+ {overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '' && (
+ <div className="flex items-center gap-1 font-medium text-green-600"><CalendarDays size={10} /><span>{formatDateDDMMYYYY(task[overviewColO])} (Prod)</span></div>
+ )}
  </div>
  ) : '-'}
  </td>
@@ -1916,14 +2033,10 @@ export default function App() {
  </div>
  <div className="grid grid-cols-2 gap-3">
  <div>
- <select className={`w-full text-xs rounded-md focus:outline-none block p-1.5 border appearance-none ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-200 text-zinc-700'}`} value={defectFilters.month} onChange={(e) => setDefectFilters({...defectFilters, month: e.target.value})}>
- {defectMonthOptions.map((m, idx) => <option key={`def-mo-${idx}`} value={m}>{m === 'All' ? 'All Months' : m}</option>)}
- </select>
+ <MultiSelectDropdown options={defectMonthOptions} value={defectFilters.month} onChange={(selected) => setDefectFilters({...defectFilters, month: selected})} placeholder={'Months'} isDarkMode={isDarkMode} />
  </div>
  <div>
- <select className={`w-full text-xs rounded-md focus:outline-none block p-1.5 border appearance-none ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-200 text-zinc-700'}`} value={defectFilters.area} onChange={(e) => setDefectFilters({...defectFilters, area: e.target.value})}>
- {defectAreaOptions.map((a, idx) => <option key={`def-ar-${idx}`} value={a}>{a === 'All' ? 'All Areas' : a}</option>)}
- </select>
+ <MultiSelectDropdown options={defectAreaOptions} value={defectFilters.area} onChange={(selected) => setDefectFilters({...defectFilters, area: selected})} placeholder={'Areas'} isDarkMode={isDarkMode} />
  </div>
  </div>
  </div>

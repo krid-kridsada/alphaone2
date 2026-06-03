@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Upload, Download, LayoutDashboard, Settings, Bell, Search, User, Users, Target, Sparkles, Filter, Share2, CheckCircle, Loader2, RefreshCw, Moon, Sun, CalendarDays, Clock, ArrowRight, Activity, AlertCircle, Info, Bug, LayoutGrid, List, Map } from 'lucide-react';
+import StackedProgressBar from './components/StackedProgressBar.jsx';
 
 // --- Firebase Database Setup ---
 import { signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
@@ -1189,7 +1190,15 @@ export default function App() {
  const completedTasks = filteredData.filter(item => item.BoardStatus === 'Prod').length;
  const uatTasks = filteredData.filter(item => item.BoardStatus === 'UAT').length;
  const inProgressTasks = filteredData.filter(item => item.BoardStatus === 'Task').length; 
- const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+const overviewTodo = Math.max(0, totalTasks - (completedTasks + uatTasks + inProgressTasks));
+const overviewSegments = [
+	{ label: 'Done', value: completedTasks, color: 'bg-green-500' },
+	{ label: 'UAT', value: uatTasks, color: 'bg-purple-500' },
+	{ label: 'In Progress', value: inProgressTasks, color: 'bg-blue-500' },
+	{ label: 'Todo', value: overviewTodo, color: 'bg-slate-400' },
+];
 
  const handleDragStart = (e, id) => e.dataTransfer.setData('taskId', id);
  const handleDragOver = (e) => e.preventDefault();
@@ -1254,6 +1263,17 @@ export default function App() {
  
  const defectProductionCount = filteredDefectData.filter(isDefectDone).length;
  const defectProgressPercent = defectTotalCount > 0 ? Math.round((defectProductionCount / defectTotalCount) * 100) : 0;
+
+const defectTodoCount = filteredDefectData.filter(item => item.BoardStatus === 'Todo').length;
+const defectInProgressCount = filteredDefectData.filter(item => item.BoardStatus === 'Task').length;
+const defectUatCount = filteredDefectData.filter(item => item.BoardStatus === 'UAT').length;
+const defectDoneCount = defectProductionCount || filteredDefectData.filter(isDefectDone).length;
+const defectSegments = [
+	{ label: 'Done', value: defectDoneCount, color: 'bg-green-500' },
+	{ label: 'UAT', value: defectUatCount, color: 'bg-purple-500' },
+	{ label: 'In Progress', value: defectInProgressCount, color: 'bg-blue-500' },
+	{ label: 'Todo', value: defectTodoCount, color: 'bg-slate-400' },
+];
 
  const handleDefectDrop = (e, status) => {
  e.preventDefault();
@@ -1562,8 +1582,8 @@ export default function App() {
  {/* Content Body */}
  <div className="p-4 md:p-8 flex flex-col gap-6 md:gap-8 w-full max-w-7xl mx-auto">
  
- {activeMenu === 'overview' ? (
- <>
+{activeMenu === 'overview' ? (
+<>
  {/* Header Action Row */}
  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full">
  <div>
@@ -1595,6 +1615,8 @@ export default function App() {
  </div>
  </div>
 
+ {/* Stacked progress bar (Overview) */}
+ <StackedProgressBar segments={overviewSegments} total={totalTasks} isDarkMode={isDarkMode} />
  {/* KPI Modules & Filters */}
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
  

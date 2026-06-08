@@ -1225,6 +1225,15 @@ const overviewSegments = [
  const matchMonth = selectedMonths.includes('All') || (itemMonth !== '' && selectedMonths.includes(itemMonth));
  const matchArea = selectedAreas.includes('All') || (itemArea !== '' && selectedAreas.includes(itemArea));
  const matchSearch = !searchQuery || Object.values(item).some(val => val && String(val).toLowerCase().includes(searchQuery.toLowerCase()));
+
+ // Determine status column (fallback to index 7 if available) and exclude Cancelled items
+ const localKeys = Object.keys(item || {});
+ const statusCol = localKeys.length > 7 ? localKeys[7] : null;
+ const statusVal = statusCol && item[statusCol] ? String(item[statusCol]).toLowerCase().trim() : '';
+ const isCancelled = statusVal.includes('cancel') || statusVal.includes('cancelled') || statusVal.includes('ยกเลิก');
+
+ if (isCancelled) return false;
+
  return matchMonth && matchArea && matchSearch;
  });
  }, [defectData, defectFilters, defectMonthColName, defectAreaColName, searchQuery]);

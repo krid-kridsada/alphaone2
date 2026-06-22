@@ -998,8 +998,11 @@ export default function App() {
  const mainText = await mainResponse.text();
  const defectText = await defectResponse.text();
 
- const { data: parsedDefectData } = parseCSVStrict(defectText);
- const processedDefectData = parsedDefectData.map((item, idx) => {
+ const { headers: defectHeaders, data: parsedDefectData } = parseCSVStrict(defectText);
+ const firstDefectColumn = defectHeaders[0];
+ const processedDefectData = parsedDefectData
+ .filter(item => item[firstDefectColumn] && String(item[firstDefectColumn]).trim() !== '')
+ .map((item, idx) => {
  let boardStatus = 'Todo';
  const keys = Object.keys(item);
  const colH = keys.length > 7 ? keys[7] : null; 
@@ -1018,7 +1021,10 @@ export default function App() {
  setDefectData(processedDefectData);
 
  const { headers: parsedHeaders, data: mainData } = parseCSVStrict(mainText);
- const processedData = mainData.map((item, idx) => {
+ const firstMainColumn = parsedHeaders[0];
+ const processedData = mainData
+ .filter(item => item[firstMainColumn] && String(item[firstMainColumn]).trim() !== '')
+ .map((item, idx) => {
  let boardStatus = 'Todo';
  if (item['BoardStatus']) {
  boardStatus = item['BoardStatus'];

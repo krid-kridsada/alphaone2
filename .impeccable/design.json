@@ -1,0 +1,766 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T02:38:56.348829+00:00",
+  "title": "Design System: Alpha One",
+  "extensions": {
+    "colorMeta": {
+      "blue-50": {
+        "role": "primary",
+        "displayName": "Blue 50",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-100": {
+        "role": "primary",
+        "displayName": "Blue 100",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-200": {
+        "role": "primary",
+        "displayName": "Blue 200",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-300": {
+        "role": "primary",
+        "displayName": "Blue 300",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-400": {
+        "role": "primary",
+        "displayName": "Blue 400",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-500": {
+        "role": "primary",
+        "displayName": "Blue 500",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-600": {
+        "role": "primary",
+        "displayName": "Blue 600",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-700": {
+        "role": "primary",
+        "displayName": "Blue 700",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-800": {
+        "role": "primary",
+        "displayName": "Blue 800",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "blue-900": {
+        "role": "primary",
+        "displayName": "Blue 900",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "zinc-50": {
+        "role": "neutral",
+        "displayName": "Zinc 50",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-100": {
+        "role": "neutral",
+        "displayName": "Zinc 100",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-200": {
+        "role": "neutral",
+        "displayName": "Zinc 200",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-300": {
+        "role": "neutral",
+        "displayName": "Zinc 300",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-400": {
+        "role": "neutral",
+        "displayName": "Zinc 400",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-500": {
+        "role": "neutral",
+        "displayName": "Zinc 500",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-600": {
+        "role": "neutral",
+        "displayName": "Zinc 600",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-700": {
+        "role": "neutral",
+        "displayName": "Zinc 700",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-800": {
+        "role": "neutral",
+        "displayName": "Zinc 800",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-900": {
+        "role": "neutral",
+        "displayName": "Zinc 900",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "zinc-950": {
+        "role": "neutral",
+        "displayName": "Zinc 950",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-bg": {
+        "role": "neutral",
+        "displayName": "Ui Bg",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-sidebar": {
+        "role": "neutral",
+        "displayName": "Ui Sidebar",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-subtle": {
+        "role": "neutral",
+        "displayName": "Ui Subtle",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-hover": {
+        "role": "neutral",
+        "displayName": "Ui Hover",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-border": {
+        "role": "neutral",
+        "displayName": "Ui Border",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-text": {
+        "role": "neutral",
+        "displayName": "Ui Text",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-muted": {
+        "role": "neutral",
+        "displayName": "Ui Muted",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-accent": {
+        "role": "primary",
+        "displayName": "Ui Accent",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "ui-selected": {
+        "role": "neutral",
+        "displayName": "Ui Selected",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "ui-dark-bg": {
+        "role": "neutral",
+        "displayName": "Ui Dark Bg",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-sidebar": {
+        "role": "neutral",
+        "displayName": "Ui Dark Sidebar",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-subtle": {
+        "role": "neutral",
+        "displayName": "Ui Dark Subtle",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-hover": {
+        "role": "neutral",
+        "displayName": "Ui Dark Hover",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-border": {
+        "role": "neutral",
+        "displayName": "Ui Dark Border",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-text": {
+        "role": "neutral",
+        "displayName": "Ui Dark Text",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-muted": {
+        "role": "neutral",
+        "displayName": "Ui Dark Muted",
+        "tonalRamp": [
+          "#1d2125",
+          "#22272b",
+          "#282e33",
+          "#344563",
+          "#626f86",
+          "#b3b9c4",
+          "#f1f2f4",
+          "#f7f8f9"
+        ]
+      },
+      "ui-dark-accent": {
+        "role": "primary",
+        "displayName": "Ui Dark Accent",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "ui-dark-selected": {
+        "role": "neutral",
+        "displayName": "Ui Dark Selected",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Primary Hover",
+        "tonalRamp": [
+          "#092957",
+          "#09326c",
+          "#0055cc",
+          "#0c66e4",
+          "#388bff",
+          "#579dff",
+          "#85b8ff",
+          "#e9f2ff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page headings; 23px below 768px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default shell text and tabular numeric content."
+      },
+      "card-title": {
+        "displayName": "Card Title",
+        "purpose": "Issue details inside cards."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Compact page actions."
+      },
+      "metadata": {
+        "displayName": "Metadata",
+        "purpose": "Issue keys, labels, and supporting values."
+      },
+      "lane-label": {
+        "displayName": "Lane Label",
+        "purpose": "Uppercase lane headings."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ui-shadow-light",
+        "value": "0 2px 5px #091e4226, 0 0 1px #091e4230",
+        "purpose": "Light menus and active cards."
+      },
+      {
+        "name": "ui-shadow-dark",
+        "value": "0 4px 12px #0006",
+        "purpose": "Dark menus and active cards."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 2px 4px #091e421a",
+        "purpose": "Issue card hover."
+      },
+      {
+        "name": "task-modal",
+        "value": "0 12px 32px #091e4240",
+        "purpose": "Task modal above its overlay."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-colors",
+        "value": "background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out",
+        "purpose": "Global button color transitions."
+      },
+      {
+        "name": "roadmap-task",
+        "value": "filter 120ms ease-out",
+        "purpose": "Roadmap task hover."
+      },
+      {
+        "name": "reduced-motion",
+        "value": ".01ms",
+        "purpose": "Global transition and animation override with prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-mobile-max",
+        "value": "420px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "767px"
+      },
+      {
+        "name": "tablet-max",
+        "value": "1023px"
+      },
+      {
+        "name": "stacked-summary-max",
+        "value": "1279px"
+      },
+      {
+        "name": "desktop-summary-min",
+        "value": "1280px"
+      },
+      {
+        "name": "wide-workspace-min",
+        "value": "1700px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The first page action, using the implemented blue action treatment.",
+      "html": "<button class=\"ds-primary\">Sync</button>",
+      "css": ".ds-primary{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:34px;padding:6px 12px;border:1px solid;border-radius:4px;font-size:12px;font-weight:550;cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,color 120ms ease-out;background:#0c66e4;border-color:#0c66e4;color:#fff}.ds-primary:hover{background:#0055cc}.ds-primary:focus-visible{outline:2px solid #0c66e4;outline-offset:3px;}.ds-primary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-primary{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Secondary action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Bordered supporting page action.",
+      "html": "<button class=\"ds-secondary\">Share</button>",
+      "css": ".ds-secondary{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:34px;padding:6px 12px;border:1px solid;border-radius:4px;font-size:12px;font-weight:550;cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,color 120ms ease-out;background:var(--ui-bg,#fff);border-color:var(--ui-border,#dcdfe4);color:var(--ui-text,#172b4d)}.ds-secondary:hover{background:var(--ui-subtle,#f1f2f4)}.ds-secondary:focus-visible{outline:2px solid #0c66e4;outline-offset:3px;}.ds-secondary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-secondary{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Icon action",
+      "kind": "button",
+      "refersTo": "button-icon",
+      "description": "Compact square action with an accessible name.",
+      "html": "<button class=\"ds-icon\" aria-label=\"Theme\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z\"/></svg></button>",
+      "css": ".ds-icon{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:4px;background:transparent;color:var(--ui-muted,#626f86);cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,color 120ms ease-out;}.ds-icon:hover{background:var(--ui-subtle,#f1f2f4)}.ds-icon:focus-visible{outline:2px solid #0c66e4;outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-icon{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Global search",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Compact shared search field; the wrapper carries focus.",
+      "html": "<label class=\"ds-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input aria-label=\"Search\" placeholder=\"Search\"/></label>",
+      "css": ".ds-search{display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;background:var(--ui-sidebar,#f7f8f9);border:1px solid var(--ui-border,#dcdfe4);border-radius:5px;color:var(--ui-muted,#626f86)}.ds-search:focus-within{border-color:var(--ui-accent,#0c66e4);outline:1px solid var(--ui-accent,#0c66e4)}.ds-search input{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;width:100%;min-width:0;border:0;background:transparent;outline:none;color:var(--ui-text,#172b4d);font-size:13px;caret-color:#0c66e4}.ds-search input::placeholder{color:var(--ui-muted,#626f86)}"
+    },
+    {
+      "name": "Project navigation",
+      "kind": "nav",
+      "refersTo": "project-nav-item",
+      "description": "Default and active project navigation states.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Project\"><button class=\"ds-nav-item ds-nav-active\" aria-current=\"page\">Overview</button><button class=\"ds-nav-item\">Roadmap</button></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:4px;background:var(--ui-sidebar,#f7f8f9);padding:12px}.ds-nav-item{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background-color 120ms ease-out,border-color 120ms ease-out,color 120ms ease-out;display:flex;align-items:center;min-height:42px;padding:10px 14px;border:0;border-radius:5px;background:transparent;color:var(--ui-muted,#626f86);text-align:left;font-size:14px;font-weight:500;cursor:pointer}.ds-nav-item:hover{background:var(--ui-hover,#e9ebee);color:var(--ui-text,#172b4d)}.ds-nav-active{background:var(--ui-selected,#e9f2ff);color:var(--ui-accent,#0c66e4);font-weight:600}.ds-nav-item:focus-visible{outline:2px solid #0c66e4;outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-nav-item{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Area tag",
+      "kind": "chip",
+      "refersTo": "area-tag",
+      "description": "Noninteractive source-derived area metadata; text is illustrative.",
+      "html": "<span class=\"ds-tag\">Area</span>",
+      "css": ".ds-tag{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:inline-block;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:1px 5px;border:0;border-radius:3px;background:var(--ui-subtle,#f1f2f4);color:var(--ui-muted,#626f86);font-size:10px;font-weight:500}"
+    },
+    {
+      "name": "Issue card",
+      "kind": "card",
+      "refersTo": "work-item",
+      "description": "Dense issue information with the implemented hover and active depth. Sample text is illustrative, not project data.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-key\">Issue key</div><h5 class=\"ds-card-title\">Task detail</h5><div class=\"ds-card-meta\">Source metadata</div></article>",
+      "css": ".ds-card{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:12px;background:var(--ui-bg,#fff);border:1px solid var(--ui-border,#dcdfe4);border-radius:5px;color:var(--ui-text,#172b4d)}.ds-card:hover{border-color:#b3b9c4;box-shadow:0 2px 4px #091e421a}.ds-card:active{box-shadow:var(--ui-shadow,0 2px 5px #091e4226,0 0 1px #091e4230)}.ds-key{font-size:11px;line-height:18px;color:var(--ui-muted,#626f86)}.ds-card-title{margin:10px 0 12px;font-size:13px;line-height:1.65;font-weight:450}.ds-card-meta{padding-top:10px;border-top:1px solid var(--ui-border,#dcdfe4);color:var(--ui-muted,#626f86);font-size:10px}"
+    },
+    {
+      "name": "Issue table",
+      "kind": "custom",
+      "refersTo": "issue-table",
+      "description": "Sticky neutral header and compact readable rows. Sample content is illustrative.",
+      "html": "<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr><th>ID</th><th>Detail &amp; Module</th></tr></thead><tbody><tr><td>Issue key</td><td>Task detail</td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap{max-height:540px;overflow:auto;border:1px solid var(--ui-border,#dcdfe4);border-radius:5px}.ds-table{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;width:100%;border-collapse:collapse;color:var(--ui-text,#172b4d)}.ds-table thead{position:sticky;top:0;background:var(--ui-sidebar,#f7f8f9)}.ds-table th,.ds-table td{padding:12px 16px;text-align:left;font-size:12px;border-bottom:1px solid var(--ui-border,#dcdfe4)}.ds-table th{color:var(--ui-muted,#626f86);font-weight:600}.ds-table tbody tr:hover{background:var(--ui-sidebar,#f7f8f9)}"
+    },
+    {
+      "name": "Task timeline row",
+      "kind": "custom",
+      "refersTo": "issue-timeline-row",
+      "description": "Task identity remains beside a horizontally scrollable time grid; no sample dates or computed bar positions are fabricated.",
+      "html": "<div class=\"ds-timeline-scroll\"><button class=\"ds-timeline\"><span class=\"ds-timeline-label\"><span class=\"ds-timeline-key\">Issue key</span><span class=\"ds-timeline-name\">Task detail</span></span><span class=\"ds-timeline-track\"></span></button></div>",
+      "css": ".ds-timeline-scroll{overflow-x:auto}.ds-timeline{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;width:100%;min-width:2360px;height:43px;padding:0;border:0;border-bottom:1px solid var(--ui-border,#dcdfe4);background:var(--ui-bg,#fff);text-align:left;color:var(--ui-text,#172b4d);cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,color 120ms ease-out;}.ds-timeline:hover,.ds-timeline:hover .ds-timeline-label{background:var(--ui-sidebar,#f7f8f9)}.ds-timeline:focus-visible{outline:2px solid #0c66e4;outline-offset:3px;}.ds-timeline-label{position:sticky;left:0;display:flex;align-items:center;gap:8px;flex:0 0 340px;min-width:0;height:100%;padding:0 16px 0 24px;border-right:1px solid var(--ui-border,#dcdfe4);background:var(--ui-bg,#fff)}.ds-timeline-key{flex-shrink:0;color:var(--ui-muted,#626f86);font-size:11px}.ds-timeline-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.ds-timeline-track{flex:1;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 24 - 1px),var(--ui-border,#dcdfe4) calc(100% / 24 - 1px),var(--ui-border,#dcdfe4) calc(100% / 24))}@media(max-width:767px){.ds-timeline-label{flex-basis:210px;padding-left:12px}}@media(prefers-reduced-motion:reduce){.ds-timeline{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Chart panel",
+      "kind": "custom",
+      "refersTo": "project-chart",
+      "description": "The viewport preserves the SVG minimum width; this preview deliberately contains no fabricated series data.",
+      "html": "<section class=\"ds-chart-panel\"><h3 class=\"ds-chart-title\">Chart</h3><div class=\"ds-chart-scroll\"><svg class=\"ds-chart-svg\" viewBox=\"0 0 600 220\" role=\"img\" aria-label=\"Chart geometry preview\"><text x=\"16\" y=\"28\">Source chart data renders here</text></svg></div></section>",
+      "css": ".ds-chart-panel{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:18px 20px;border:1px solid var(--ui-border,#dcdfe4);border-radius:6px;background:var(--ui-bg,#fff);color:var(--ui-text,#172b4d)}.ds-chart-title{font-size:13px;font-weight:600}.ds-chart-scroll{width:100%;height:238px;overflow-x:auto;overflow-y:hidden}.ds-chart-svg{display:block;width:100%;min-width:600px;height:220px}.ds-chart-svg text{font-size:11px;fill:var(--ui-muted,#626f86)}@media(max-width:767px){.ds-chart-panel{padding:16px}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Jira Workbench",
+    "overview": "Alpha One uses the Jira interface reference explicitly selected by the user: a compact global bar, pale project sidebar, blue selection states, neutral work surfaces, and dense issue information. The visual language serves the existing overview, roadmap, meeting cycle, and issue tracking screens. It retains the Alpha One name and current Thai/English content.\n\nThis is a scan of the implemented system, not a new product specification. Color, spacing, and components come from src/index.css, src/App.jsx, and src/components/StackedProgressBar.jsx. The available evidence does not establish a particular end-user audience. The existing data, calculations, status meanings, and action behavior remain the authority for content and interactions.",
+    "keyCharacteristics": [
+      "Compact work-management hierarchy with rectangular controls.",
+      "Blue navigation and actions against light or dark neutral surfaces.",
+      "Dense issue cards, tables, and task-row timelines.",
+      "Responsive navigation and deliberate scrolling for wide work areas."
+    ],
+    "rules": [],
+    "dos": [
+      "Do use the existing --ui-* role variables so both themes remain coherent.",
+      "Do retain visible keyboard focus and the reduced-motion override.",
+      "Do preserve Thai/English content, real issue values, status labels, and existing interaction behavior.",
+      "Do keep board lanes, wide tables, timelines, and charts scrollable within their work area.",
+      "Do use 13px issue titles, 10–12px metadata, and the established compact corner sizes."
+    ],
+    "donts": [
+      "Don't introduce a new palette, typography family, or decorative surface treatment without an explicit direction change.",
+      "Don't replace existing data with fabricated people, counts, or project details.",
+      "Don't change Firebase, fetching, CSV parsing, sync, export, share, filtering, search, calculation, status, or drag-and-drop logic as part of visual work.",
+      "Don't shrink chart geometry below its 600px minimum width to fit a narrow viewport."
+    ]
+  }
+}

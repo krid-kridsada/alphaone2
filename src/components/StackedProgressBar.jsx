@@ -4,8 +4,8 @@ const StackedProgressBar = ({ segments = [], total = 0, isDarkMode = false }) =>
   const totalValue = segments.reduce((s, a) => s + (a.value || 0), 0) || total || 1;
 
   return (
-    <div className="w-full mb-3">
-      <div className={`w-full h-3 rounded-full overflow-hidden border ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+    <div className="status-summary w-full">
+      <div className={`w-full h-1.5 rounded overflow-hidden border ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
         <div className="flex h-full">
           {segments.map((seg, idx) => (
             <div
@@ -23,7 +23,7 @@ const StackedProgressBar = ({ segments = [], total = 0, isDarkMode = false }) =>
           <div key={idx} className="flex items-center gap-2">
             <div className={`w-3 h-3 rounded-sm ${seg.color || 'bg-blue-500'}`}></div>
             <div className={`${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              {seg.label} <span className="text-[11px] text-zinc-400">({seg.value || 0})</span>
+              {seg.label} <span className="text-xs text-zinc-400">({seg.value || 0})</span>
             </div>
           </div>
         ))}

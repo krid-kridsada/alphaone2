@@ -112,15 +112,15 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  };
 
  return (
- <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto font-sans tracking-tight">
+ <div className="meeting-dashboard flex flex-col gap-4 w-full max-w-7xl mx-auto font-sans tracking-tight">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">
- <div className={`p-5 rounded-xl border flex items-center gap-4 group transition-all ${isDarkMode ? 'border-purple-700/50' : 'border-purple-200'}`} style={{ background: isDarkMode ? 'linear-gradient(to bottom right, rgba(88, 28, 135, 0.4), rgba(49, 46, 129, 0.4))' : 'linear-gradient(to bottom right, #f3e8ff, #e0e7ff)'}}>
+ <div className={`p-5 rounded-lg border flex items-center gap-4 group transition-all ${isDarkMode ? 'border-purple-700/50' : 'border-purple-200'}`} style={{ background: isDarkMode ? 'linear-gradient(to bottom right, rgba(88, 28, 135, 0.4), rgba(49, 46, 129, 0.4))' : 'linear-gradient(to bottom right, #f3e8ff, #e0e7ff)'}}>
  <div className={`p-3 rounded-lg shrink-0 ${isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-white text-purple-600 shadow-sm'}`}>
  <Users size={20} />
  </div>
  <div className="flex-1">
  <div className="flex items-center gap-2 mb-1">
- <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full tracking-wider flex items-center gap-1 ${isDarkMode ? 'bg-purple-500/30 text-purple-200' : 'bg-purple-200 text-purple-800'}`}>
+ <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full tracking-wider flex items-center gap-1 ${isDarkMode ? 'bg-purple-500/30 text-purple-200' : 'bg-purple-200 text-purple-800'}`}>
  <Sparkles size={10} /> ทุกสิ้นเดือน
  </span>
  </div>
@@ -129,13 +129,13 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  </div>
  </div>
 
- <div className={`p-5 rounded-xl border flex items-center gap-4 group transition-all ${isDarkMode ? 'border-emerald-700/50' : 'border-emerald-200'}`} style={{ background: isDarkMode ? 'linear-gradient(to bottom right, rgba(6, 78, 59, 0.4), rgba(2, 44, 34, 0.4))' : 'linear-gradient(to bottom right, #d1fae5, #ccfbf1)'}}>
+ <div className={`p-5 rounded-lg border flex items-center gap-4 group transition-all ${isDarkMode ? 'border-emerald-700/50' : 'border-emerald-200'}`} style={{ background: isDarkMode ? 'linear-gradient(to bottom right, rgba(6, 78, 59, 0.4), rgba(2, 44, 34, 0.4))' : 'linear-gradient(to bottom right, #d1fae5, #ccfbf1)'}}>
  <div className={`p-3 rounded-lg shrink-0 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white text-emerald-600 shadow-sm'}`}>
  <Target size={20} />
  </div>
  <div className="flex-1">
  <div className="flex items-center gap-2 mb-1">
- <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full tracking-wider flex items-center gap-1 ${isDarkMode ? 'bg-emerald-500/30 text-emerald-200' : 'bg-emerald-200 text-emerald-800'}`}>
+ <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full tracking-wider flex items-center gap-1 ${isDarkMode ? 'bg-emerald-500/30 text-emerald-200' : 'bg-emerald-200 text-emerald-800'}`}>
  <Sparkles size={10} /> สัปดาห์แรกของเดือน
  </span>
  </div>
@@ -146,13 +146,13 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  </div>
 
  <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
- <div className={`xl:col-span-2 rounded-xl border flex flex-col overflow-hidden ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`xl:col-span-2 rounded-lg border flex flex-col overflow-hidden ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className={`px-5 py-4 border-b flex justify-between items-center ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
  <h3 className={`font-semibold text-sm flex items-center gap-2 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
  <CalendarDays size={16}/>
  Weekly Timeline View
  </h3>
- <div className="flex flex-wrap gap-2 text-[10px] font-medium">
+ <div className="flex flex-wrap gap-2 text-[11px] font-medium">
  <span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-amber-50 border-amber-400 text-amber-700'}`}>UAT</span>
  <span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-blue-500/10 border-blue-500 text-blue-400' : 'bg-blue-50 border-blue-400 text-blue-700'}`}>Deploy</span>
  <span className={`px-2 py-1 rounded border-l-2 ${isDarkMode ? 'bg-orange-500/10 border-orange-500 text-orange-400' : 'bg-orange-50 border-orange-400 text-orange-700'}`}>Fix Bug</span>
@@ -163,7 +163,7 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  
  <div className="overflow-x-auto custom-scrollbar">
  <div className="min-w-[1000px] p-4">
- <div className={`rounded-xl border flex flex-col ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'} divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
+ <div className={`rounded-lg border flex flex-col ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'} divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
  <div className={`grid grid-cols-[180px_repeat(5,1fr)] divide-x ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
  <div className={`p-3 font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center ${isDarkMode ? 'bg-zinc-900/50 text-zinc-500' : 'bg-zinc-50 text-zinc-500'}`}>
  Teams
@@ -178,7 +178,7 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  {TEAMS.map((team) => (
  <div key={team} className={`grid grid-cols-[180px_repeat(5,1fr)] divide-x ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
  <div className={`p-4 flex flex-col justify-center items-start bg-transparent`}>
- <div className="text-xl mb-1">{TEAM_ICONS[team]}</div>
+ <div className="text-xl mb-1"><Users size={20} aria-hidden="true" /></div>
  <span className={`font-medium text-[11px] leading-tight ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{team}</span>
  </div>
 
@@ -190,8 +190,8 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  const style = TYPE_STYLES[task.type][isDarkMode ? 'dark' : 'light'];
  return (
  <div key={task.id} className={`p-2.5 rounded-lg flex flex-col gap-1.5 transition-shadow cursor-default ${style}`}>
- <span className="font-semibold text-[10px] sm:text-[11px] leading-tight">{task.title}</span>
- <div className="text-[9px] sm:text-[10px] font-medium opacity-80 flex items-center gap-1">
+ <span className="font-semibold text-[11px] sm:text-[11px] leading-tight">{task.title}</span>
+ <div className="text-[11px] sm:text-[11px] font-medium opacity-80 flex items-center gap-1">
  <Clock size={10} /> {task.time}
  </div>
  </div>
@@ -208,7 +208,7 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  </div>
 
  <div className="flex flex-col gap-4">
- <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-5 rounded-lg border ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <h3 className={`font-semibold text-sm mb-3 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Workload Heatmap</h3>
  <div className="flex gap-2">
  {DAYS.map(day => {
@@ -228,10 +228,10 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  </div>
  </div>
 
- <div className={`flex-1 p-5 rounded-xl border flex flex-col ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`flex-1 p-5 rounded-lg border flex flex-col ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-center mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
  <h3 className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>รายละเอียด: วัน{selectedDay}</h3>
- <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${isDarkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-600'}`}>
+ <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${isDarkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-600'}`}>
  {MOCK_MEETING_DATA.filter(d => d.day === selectedDay).length} Tasks
  </span>
  </div>
@@ -243,14 +243,14 @@ const MeetingCycleDashboard = ({ isDarkMode }) => {
  MOCK_MEETING_DATA.filter(d => d.day === selectedDay).map(task => {
  const style = TYPE_STYLES[task.type][isDarkMode ? 'dark' : 'light'];
  return (
- <div key={`detail-${task.id}`} className={`p-3 rounded-xl border ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div key={`detail-${task.id}`} className={`p-3 rounded-lg border ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
  <div className="flex justify-between items-start mb-1.5">
- <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${style}`}>{task.type}</span>
- <span className={`text-[10px] flex items-center gap-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}><Clock size={12}/> {task.time}</span>
+ <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${style}`}>{task.type}</span>
+ <span className={`text-[11px] flex items-center gap-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}><Clock size={12}/> {task.time}</span>
  </div>
  <h4 className={`font-semibold text-sm mb-1 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{task.title}</h4>
  <p className={`text-xs mb-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{task.desc}</p>
- <div className={`text-[10px] flex items-center gap-1.5 font-medium ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+ <div className={`text-[11px] flex items-center gap-1.5 font-medium ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
  <Users size={12} /> {task.team}
  </div>
  </div>
@@ -549,9 +549,9 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  }, [displayedCategories]);
 
  return (
- <div className="flex flex-col gap-3">
+ <div className="roadmap-dashboard flex flex-col gap-3">
  {/* ข้อมูลสรุปสีต่างๆ (Legend & Stats) */}
- <div className="flex flex-wrap gap-2 md:gap-3 items-center">
+ <div className="roadmap-legend flex flex-wrap gap-2 md:gap-3 items-center">
  {['prod', 'task', 'uat', 'todo'].map((statusKey, index) => {
  const colors = {
  prod: isDarkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700',
@@ -568,28 +568,28 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg border shadow-sm transition ${colors[statusKey]} ${active ? 'ring-2 ring-offset-1 ring-blue-400' : ''}`}
  >
  <div className={`w-2.5 h-2.5 rounded-full ${statusKey === 'prod' ? 'bg-emerald-500' : statusKey === 'task' ? 'bg-blue-500' : statusKey === 'uat' ? 'bg-purple-500' : 'bg-zinc-400 md:bg-zinc-500'}`}></div>
- <span className="text-[10px] md:text-xs font-semibold">{statusLabels[statusKey]}: {stats[statusKey]}</span>
+ <span className="text-[11px] md:text-xs font-semibold">{statusLabels[statusKey]}: {stats[statusKey]}</span>
  </button>
  );
  })}
  <div className="ml-auto flex items-center gap-2">
  {statusFilter && (
- <span className={`text-[10px] font-medium px-2 py-1 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
+ <span className={`text-[11px] font-medium px-2 py-1 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
  Filter: {statusLabels[statusFilter]}
  </span>
  )}
- <span className={`text-[10px] font-medium px-2 py-1 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
+ <span className={`text-[11px] font-medium px-2 py-1 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
  Total: {stats.prod + stats.task + stats.uat + stats.todo} Tasks
  </span>
  </div>
  </div>
 
  {/* Grid Roadmap Dashboard */}
- <div className={`w-full overflow-x-auto rounded-xl border shadow-sm custom-scrollbar ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'}`}>
- <div className="min-w-[4800px] flex flex-col"> 
+ <div className={`roadmap-canvas w-full overflow-x-auto rounded-lg border custom-scrollbar ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'}`}>
+ <div className="roadmap-grid min-w-[2360px] flex flex-col">
  {/* Header */}
  <div className="flex">
- <div className={`w-14 shrink-0 border-r border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}></div>
+ <div className={`roadmap-corner w-44 shrink-0 border-r border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>Work item</div>
  <div className="flex-1">
  {/* Quarters Header */}
  <div className="grid grid-cols-4">
@@ -602,7 +602,7 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  {/* Months Header */}
  <div className="grid grid-cols-12">
  {months.map((m, i) => (
- <div key={i} className={`text-center py-1.5 text-[10px] font-bold border-r border-b last:border-r-0 ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50 text-zinc-400' : 'border-zinc-200 bg-white text-zinc-600'}`}>
+ <div key={i} className={`text-center py-1.5 text-[11px] font-bold border-r border-b last:border-r-0 ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50 text-zinc-400' : 'border-zinc-200 bg-white text-zinc-600'}`}>
  {m}
  </div>
  ))}
@@ -610,94 +610,34 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  </div>
  </div>
 
- {/* Body */}
- <div className="flex flex-col relative">
- {/* Background Grid Lines (24 Sprints) */}
- <div className="absolute top-0 bottom-0 left-14 right-0 grid pointer-events-none" style={{ gridTemplateColumns: 'repeat(24, minmax(0, 1fr))' }}>
- {Array.from({ length: 24 }).map((_, i) => (
- <div key={`line-${i}`} className={`border-r ${isDarkMode ? 'border-zinc-800/50' : 'border-zinc-200'} h-full border-dashed`}></div>
- ))}
- </div>
-
+ {/* Category groups and task rows use the existing task dates and statuses. */}
+ <div className="timeline-body">
  {displayedCategories.map((cat, idx) => (
- <div key={cat.id} className={`flex border-b last:border-b-0 ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
- {/* Category Sidebar */}
- <div 
- className={`w-14 shrink-0 flex items-center justify-center border-r ${isDarkMode ? 'border-zinc-800/50' : 'border-zinc-200/50'}`} 
- style={{ background: isDarkMode ? cat.theme.dark.grad : cat.theme.light.grad }}
- >
- <span 
- className={`text-[10px] font-bold whitespace-nowrap tracking-widest py-2 ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}
- style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
- >
- {cat.title}
- </span>
- </div>
- 
- {/* Category Rows */}
- <div className="flex-1 relative z-10 px-0">
- <div className="grid h-full" style={{ gridTemplateColumns: 'repeat(24, minmax(0, 1fr))' }}>
- {Array.from({ length: 24 }).map((_, colIdx) => {
- const sprintTasks = cat.tasks.filter(t => t.start === colIdx + 1);
- return (
- <div key={colIdx} className="flex flex-col gap-1 p-1 h-full min-h-[40px]">
- {sprintTasks.map((task, tIdx) => {
- const tTheme = getTaskTheme(task.status, isDarkMode);
- return (
- <div
- key={tIdx}
- onClick={() => setSelectedTask({ ...task, category: cat.title, tTheme: tTheme })}
- className="flex flex-col p-2 rounded-lg border cursor-pointer transition-all duration-300 group hover:z-30 hover:-translate-y-0.5 hover:shadow-md backdrop-blur-sm"
- style={{ 
- background: tTheme.bg,
- borderColor: tTheme.border,
- }}
- >
- <div className="flex items-start gap-1.5 mb-1">
- {task.no && (
- <span 
- className="font-bold text-[9px] px-1 py-0.5 rounded-sm shrink-0 shadow-sm" 
- style={{ backgroundColor: isDarkMode ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.7)', color: tTheme.text }}
- >
- {task.no}
- </span>
- )}
- <span 
- className="font-bold text-[10px] sm:text-xs leading-snug line-clamp-2 transition-colors" 
- title={task.name}
- style={{ color: tTheme.text }}
- >
- {task.name}
- </span>
- </div>
- 
- {(task.month || (task.benefit && task.benefit !== '-')) && (
- <div 
- className="flex flex-col gap-1 mt-auto pt-1.5 border-t"
- style={{ borderColor: tTheme.border }}
- >
- {task.month && (
- <div className={`flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold opacity-90`} style={{ color: tTheme.text }}>
- <CalendarDays size={10} />
- <span>{task.month}</span>
- </div>
- )}
- {task.benefit && task.benefit !== '-' && (
- <div className={`flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold opacity-90`} style={{ color: tTheme.text }}>
- <Target size={10} className="shrink-0" />
- <span className="line-clamp-1" title={task.benefit}>{task.benefit}</span>
- </div>
- )}
- </div>
- )}
- </div>
- );
- })}
- </div>
- );
- })}
- </div>
- </div>
+ <div key={cat.id} className="timeline-group">
+   <div className="timeline-group-heading">
+     <span className="timeline-group-label"><LayoutGrid size={14} />{cat.title}<span>{cat.tasks.length}</span></span>
+   </div>
+   {cat.tasks.map((task, tIdx) => {
+     const tTheme = getTaskTheme(task.status, isDarkMode);
+     return (
+       <button key={tIdx} type="button" className="timeline-issue-row"
+         onClick={() => setSelectedTask({ ...task, category: cat.title, tTheme: tTheme })}
+         title={task.name}>
+         <span className="timeline-issue-label">
+           <CheckCircle size={14} className="timeline-issue-icon" aria-hidden="true" />
+           {task.no && <span className="timeline-issue-key">{task.no}</span>}
+           <span className="timeline-issue-name">{task.name}</span>
+           {task.benefit && task.benefit !== '-' && <Target size={13} className="timeline-benefit" aria-label={task.benefit} />}
+         </span>
+         <span className="timeline-track">
+           <span className="timeline-bar" style={{gridColumn: `${task.start} / span 1`, background: tTheme.bg, borderColor: tTheme.border, color: tTheme.text}}>
+             <span className="timeline-bar-dot" style={{background: tTheme.text}} />
+             <span>{task.month}</span>
+           </span>
+         </span>
+       </button>
+     );
+   })}
  </div>
  ))}
  </div>
@@ -705,9 +645,10 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
 
  {/* Popup Modal */}
  {selectedTask && (
- <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setSelectedTask(null)}>
+ <div className="task-modal-overlay fixed inset-0 z-[110] flex items-center justify-center p-4" onClick={() => setSelectedTask(null)}>
  <div
- className="relative w-full max-w-md p-6 rounded-2xl shadow-2xl transform transition-all animate-in zoom-in-95 duration-200 border"
+ className="task-modal relative w-full max-w-lg p-6 rounded-lg"
+ role="dialog" aria-modal="true" aria-label={selectedTask.name}
  style={{
  background: isDarkMode ? '#18181b' : '#ffffff',
  borderColor: selectedTask.tTheme.border,
@@ -716,6 +657,7 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  >
  <button
  onClick={() => setSelectedTask(null)}
+ aria-label="Close task details"
  className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-colors font-bold ${isDarkMode ? 'hover:bg-zinc-800 text-zinc-400' : 'hover:bg-zinc-100 text-zinc-500'}`}
  >
  ✕
@@ -723,7 +665,7 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  
  <div className="mb-4 pr-6 flex gap-2 flex-wrap items-center">
  <span 
- className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border"
+ className="text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border"
  style={{
  background: selectedTask.tTheme.bg,
  borderColor: selectedTask.tTheme.border,
@@ -733,12 +675,12 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  {selectedTask.status === 'prod' ? 'DONE' : selectedTask.status === 'uat' ? 'UAT' : selectedTask.status === 'task' ? 'IN PROGRESS' : 'NOT START'}
  </span>
  <span 
- className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}
+ className={`text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}
  >
  {selectedTask.category}
  </span>
  {selectedTask.no && (
- <span className={`text-[10px] font-bold px-2 py-1 rounded-full text-zinc-500 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 border border-transparent`}>
+ <span className={`text-[11px] font-bold px-2 py-1 rounded-full text-zinc-500 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 border border-transparent`}>
  {selectedTask.no}
  </span>
  )}
@@ -747,43 +689,43 @@ const RoadmapDashboard = ({ isDarkMode, data, searchQuery = '', showBenefitOnly 
  <h3 className={`text-xl font-bold mb-6 leading-snug ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>{selectedTask.name}</h3>
  
  <div className="flex flex-col gap-3">
- <div className={`flex items-center gap-4 p-4 rounded-xl border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div className={`flex items-center gap-4 p-4 rounded-lg border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
  <div className={`p-2.5 rounded-lg`} style={{ background: selectedTask.tTheme.bg, color: selectedTask.tTheme.text }}>
  <CalendarDays size={20} />
  </div>
  <div>
- <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>เดือนที่ส่งมอบ</p>
+ <p className={`text-[11px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>เดือนที่ส่งมอบ</p>
  <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{selectedTask.month}</p>
  </div>
  </div>
  
- <div className={`flex items-center gap-4 p-4 rounded-xl border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div className={`flex items-center gap-4 p-4 rounded-lg border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
  <div className={`p-2.5 rounded-lg`} style={{ background: selectedTask.tTheme.bg, color: selectedTask.tTheme.text }}>
  <Target size={20} />
  </div>
  <div>
- <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Benefit ที่คาดว่าจะได้รับ</p>
+ <p className={`text-[11px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Benefit ที่คาดว่าจะได้รับ</p>
  <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{selectedTask.benefit && selectedTask.benefit !== '-' ? selectedTask.benefit : 'ไม่ได้ระบุ'}</p>
  </div>
  </div>
 
  <div className={`flex items-stretch gap-4 mt-2`}> 
- <div className={`flex-1 flex items-center gap-4 p-4 rounded-xl border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div className={`flex-1 flex items-center gap-4 p-4 rounded-lg border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
  <div className={`p-2.5 rounded-lg`} style={{ background: selectedTask.tTheme.bg, color: selectedTask.tTheme.text }}>
  <CalendarDays size={20} />
  </div>
  <div>
- <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>UAT Date</p>
+ <p className={`text-[11px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>UAT Date</p>
  <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{formatDateDisplay(selectedTask.uat) || 'ไม่ได้ระบุ'}</p>
  </div>
  </div>
 
- <div className={`flex-1 flex items-center gap-4 p-4 rounded-xl border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+ <div className={`flex-1 flex items-center gap-4 p-4 rounded-lg border ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
  <div className={`p-2.5 rounded-lg`} style={{ background: selectedTask.tTheme.bg, color: selectedTask.tTheme.text }}>
  <CalendarDays size={20} />
  </div>
  <div>
- <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Prod Date</p>
+ <p className={`text-[11px] uppercase font-bold tracking-wider mb-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Prod Date</p>
  <p className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>{formatDateDisplay(selectedTask.prod) || 'ไม่ได้ระบุ'}</p>
  </div>
  </div>
@@ -838,7 +780,7 @@ const MultiSelectDropdown = ({ options = [], value = [], onChange = () => {}, pl
 	const isSelected = (opt) => Array.isArray(value) && value.includes(opt);
 
 	return (
-		<div className="relative" ref={ref}>
+		<div className="filter-select relative" ref={ref}>
 			<button type="button" onClick={() => setOpen(prev => !prev)} className={`w-full text-left px-3 py-1.5 rounded-md border flex items-center justify-between gap-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-700'}`}>
 				<div className="flex-1 truncate text-sm">
 					{Array.isArray(value) && value.length > 0 ? (value.includes('All') ? 'All' : value.join(', ')) : placeholder}
@@ -847,7 +789,7 @@ const MultiSelectDropdown = ({ options = [], value = [], onChange = () => {}, pl
 			</button>
 
 			{open && (
-				<div className={`absolute mt-2 right-0 left-0 z-50 rounded-md shadow-xl border overflow-auto max-h-56 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+				<div className={`filter-options absolute mt-2 right-0 left-0 z-50 rounded-md shadow-xl border overflow-auto max-h-56 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
 					<div className="p-2">
 						{options.map((opt, i) => (
 							<label key={`opt-${i}`} className="flex items-center gap-2 p-2 rounded hover:bg-zinc-50 cursor-pointer" style={{display: 'flex'}}>
@@ -1408,8 +1350,9 @@ const defectSegments = [
  const actualPath = actualData.map((val, i) => `${getX(i)},${getY(val)}`).join(' ');
 
  return (
- <div className="relative w-full h-full min-h-[220px]" onMouseLeave={() => setHoveredPoint(null)}>
- <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+ <div className="chart-viewport relative w-full" onMouseLeave={() => setHoveredPoint(null)}>
+ <div className="chart-scroll custom-scrollbar">
+ <svg className="chart-svg" width="100%" height="220" viewBox={`0 0 ${w} ${h + 18}`} preserveAspectRatio="none">
  <line x1={paddingX} y1={paddingY} x2={w - paddingX} y2={paddingY} stroke={isDarkMode ? "#27272a" : "#f4f4f5"} strokeWidth="1" />
  <line x1={paddingX} y1={h/2} x2={w - paddingX} y2={h/2} stroke={isDarkMode ? "#27272a" : "#f4f4f5"} strokeWidth="1" />
  <line x1={paddingX} y1={h - paddingY} x2={w - paddingX} y2={h - paddingY} stroke={isDarkMode ? "#3f3f46" : "#e4e4e7"} strokeWidth="1" />
@@ -1435,7 +1378,7 @@ const defectSegments = [
 
  {/* Render Actual Numbers if toggled */}
  {showLabels && actualData.map((val, i) => (
- <text key={`actual-lbl-${i}`} x={getX(i)} y={getY(val) + 16} fontSize="11" fill={chartType === 'burndown' ? "#60a5fa" : "#34d399"} textAnchor="middle" fontWeight="bold">
+ <text key={`actual-lbl-${i}`} x={getX(i)} y={getY(val) + 16} fontSize="11" fill={isDarkMode ? (chartType === 'burndown' ? '#85b8ff' : '#7ee2b8') : (chartType === 'burndown' ? '#0055cc' : '#216e4e')} textAnchor="middle" fontWeight="bold">
  {val}
  </text>
  ))}
@@ -1473,12 +1416,14 @@ const defectSegments = [
  <rect x={getX(i) - 20} y={0} width={40} height={h} fill="transparent" />
  <circle cx={getX(i)} cy={getY(actualData[i])} r="4" fill={pointColor} stroke={isDarkMode ? "#09090b" : "#fff"} strokeWidth="2" className={isBlinking ? 'animate-pulse' : ''} />
  <text x={getX(i)} y={h - 2} fontSize="9" fill={isDarkMode ? "#71717a" : "#a1a1aa"} textAnchor="middle" className={`group-hover:font-bold transition-colors ${isBlinking ? 'group-hover:text-yellow-400' : (isOnTarget ? 'group-hover:text-green-400' : 'group-hover:text-blue-400')}`}>
- {label.length > 8 ? label.substring(0, 8) : label}
+ <tspan x={getX(i)} dy="0">{label === 'Start' ? label : label.split('-')[0]}</tspan>
+ {label.includes('-') && <tspan x={getX(i)} dy="13">{label.split('-')[1]}</tspan>}
  </text>
  </g>
  );
  })}
  </svg>
+ </div>
 
  {hoveredPoint && hoveredPoint.chartType === chartType && hoveredPoint.mode === mode && (
  <div
@@ -1515,11 +1460,11 @@ const defectSegments = [
  const columns = ['Todo', 'Task', 'UAT', 'Prod'];
 
  return (
- <div className={`flex flex-col md:flex-row min-h-screen w-full font-sans tracking-tight relative transition-colors duration-300 pb-16 md:pb-0 ${isDarkMode ? 'bg-black text-zinc-100' : 'bg-zinc-50 text-zinc-900'}`}>
+ <div className={`app-shell ${isDarkMode ? 'theme-dark' : 'theme-light'}`}>
  
  {/* Loading Overlay */}
  {isSyncing && (
- <div className={`fixed inset-0 backdrop-blur-sm z-[100] flex flex-col items-center justify-center ${isDarkMode ? 'bg-black/80' : 'bg-white/80'}`}>
+ <div className={`sync-overlay fixed inset-0 z-[100] flex flex-col items-center justify-center ${isDarkMode ? 'bg-black/80' : 'bg-white/80'}`}>
  <Loader2 className={`w-8 h-8 animate-spin mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`} />
  <p className="font-medium text-sm">Syncing Data...</p>
  </div>
@@ -1527,86 +1472,88 @@ const defectSegments = [
 
  {/* Toast Notification */}
  {toastMessage && (
- <div className={`fixed top-6 right-6 px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 z-[100] animate-in fade-in slide-in-from-top-4 border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-white' : 'bg-white border-zinc-200 text-black'}`}>
+ <div className={`toast-message fixed top-6 right-6 px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 z-[100] animate-in fade-in slide-in-from-top-4 border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-white' : 'bg-white border-zinc-200 text-black'}`}>
  <CheckCircle size={16} className={isDarkMode ? 'text-zinc-300' : 'text-zinc-600'} />
  <span className="font-medium text-sm">{toastMessage}</span>
  </div>
  )}
 
- {/* Vercel-style Sidebar */}
- <div className={`fixed bottom-0 left-0 right-0 md:relative md:w-64 flex flex-row md:flex-col items-center md:items-start py-2 md:py-6 shadow-[0_-5px_15px_-3px_rgba(0,0,0,0.05)] md:shadow-none z-50 shrink-0 transition-all duration-300 md:sticky md:top-0 md:h-screen ${isDarkMode ? 'bg-zinc-950 md:border-r border-zinc-800 border-t md:border-t-0' : 'bg-white md:border-r border-zinc-200 border-t md:border-t-0'}`}>
- <div className="hidden md:flex items-center w-full px-6 mb-8">
- <div className={`p-2 rounded-md shrink-0 border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-white' : 'bg-zinc-100 border-zinc-200 text-black'}`}><Activity size={18} /></div>
- <span className="ml-3 font-semibold text-base tracking-tight">Alpha One</span>
- </div>
- 
- <nav className="w-full flex flex-row md:flex-col justify-around md:justify-start gap-1 md:gap-1 px-2 md:px-4">
- <button onClick={() => setActiveMenu('overview')} className={`flex-1 md:flex-none w-full flex flex-col md:flex-row items-center md:justify-start py-2.5 md:py-2 md:px-3 rounded-md transition-all text-[10px] md:text-sm font-medium ${activeMenu === 'overview' ? (isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600') : (isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-900' : 'text-zinc-500 hover:text-black hover:bg-zinc-50')}`}>
- <LayoutDashboard size={16} className="mb-1 md:mb-0 md:mr-3 shrink-0" /> <span className="hidden md:block">Overview</span><span className="md:hidden">Overview</span>
- </button>
-
- <button onClick={() => setActiveMenu('roadmap')} className={`flex-1 md:flex-none w-full flex flex-col md:flex-row items-center md:justify-start py-2.5 md:py-2 md:px-3 rounded-md transition-all text-[10px] md:text-sm font-medium ${activeMenu === 'roadmap' ? (isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600') : (isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-900' : 'text-zinc-500 hover:text-black hover:bg-zinc-50')}`}>
- <Map size={16} className="mb-1 md:mb-0 md:mr-3 shrink-0" /> <span className="hidden md:block">Roadmap</span><span className="md:hidden">Map</span>
- </button>
- 
- <button onClick={() => setActiveMenu('meeting')} className={`flex-1 md:flex-none w-full flex flex-col md:flex-row items-center md:justify-start py-2.5 md:py-2 md:px-3 rounded-md transition-all text-[10px] md:text-sm font-medium ${activeMenu === 'meeting' ? (isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600') : (isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-900' : 'text-zinc-500 hover:text-black hover:bg-zinc-50')}`}>
- <CalendarDays size={16} className="mb-1 md:mb-0 md:mr-3 shrink-0" /> <span className="hidden md:block">Meeting Cycle</span><span className="md:hidden">Meeting</span>
- </button>
-
- <button onClick={() => setActiveMenu('defect')} className={`flex-1 md:flex-none w-full flex flex-col md:flex-row items-center md:justify-start py-2.5 md:py-2 md:px-3 rounded-md transition-all text-[10px] md:text-sm font-medium ${activeMenu === 'defect' ? (isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600') : (isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-900' : 'text-zinc-500 hover:text-black hover:bg-zinc-50')}`}>
- <Bug size={16} className="mb-1 md:mb-0 md:mr-3 shrink-0" /> <span className="hidden md:block">Issue Tracking</span><span className="md:hidden">Issues</span>
- </button>
- </nav>
- 
- <div className="mt-auto hidden md:flex flex-col gap-1 w-full px-4">
- <button className={`w-full flex items-center py-2 px-3 rounded-md transition-all text-sm font-medium ${isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-900' : 'text-zinc-500 hover:text-black hover:bg-zinc-50'}`}>
- <Settings size={16} className="mr-3 shrink-0" /> Settings
- </button>
- </div>
- </div>
-
- {/* Main Content Area */}
- <div className="flex-1 flex flex-col min-w-0 w-full">
- 
- {/* Next.js Header */}
- <header className={`h-14 border-b flex items-center justify-between px-4 md:px-8 shrink-0 z-30 sticky top-0 backdrop-blur-md transition-colors duration-300 ${isDarkMode ? 'bg-black/70 border-zinc-800' : 'bg-white/70 border-zinc-200'}`}>
- <div className={`flex items-center rounded-md px-3 py-1.5 w-40 md:w-64 border transition-all ${isDarkMode ? 'bg-zinc-900 border-zinc-800 focus-within:border-zinc-600' : 'bg-zinc-50 border-zinc-200 focus-within:border-zinc-400'}`}>
- <Search size={14} className={isDarkMode ? 'text-zinc-500' : 'text-zinc-400'} />
- <input 
- type="text" 
- placeholder="Search..." 
- value={searchQuery}
- onChange={(e) => setSearchQuery(e.target.value)}
- className={`bg-transparent border-none focus:outline-none ml-2 text-xs w-full ${isDarkMode ? 'text-zinc-200 placeholder-zinc-500' : 'text-zinc-900 placeholder-zinc-400'}`} 
- />
- </div>
- 
- <div className="flex items-center gap-2 md:gap-4">
- <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-1.5 rounded-md transition-colors ${isDarkMode ? 'text-zinc-400 hover:bg-zinc-800' : 'text-zinc-500 hover:bg-zinc-100'}`}>
- {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
- </button>
- <div className={`w-px h-4 ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`}></div>
- <div className="flex items-center gap-2 cursor-pointer">
- <div className={`w-7 h-7 rounded-full flex items-center justify-center border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
- <User size={14} />
- </div>
- </div>
- </div>
+ {/* Global workspace navigation */}
+ <header className="global-header">
+   <div className="global-brand">
+     <div className="brand-symbol" aria-hidden="true"><Activity size={21} strokeWidth={2.4} /></div>
+     <span>Alpha One</span>
+     <span className="brand-divider" aria-hidden="true" />
+     <span className="workspace-name">Project workspace</span>
+   </div>
+   <div className="global-search">
+     <Search size={17} aria-hidden="true" />
+     <input
+       type="search"
+       aria-label="Search this project"
+       placeholder="Search this project"
+       value={searchQuery}
+       onChange={(e) => setSearchQuery(e.target.value)}
+     />
+   </div>
+   <div className="global-actions">
+     <button type="button" onClick={() => setIsDarkMode(!isDarkMode)}
+       className="icon-button" aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
+       {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+     </button>
+     <div className="workspace-avatar" title="Alpha One workspace">AO</div>
+   </div>
  </header>
 
- {/* Content Body */}
- <div className="p-4 md:p-8 flex flex-col gap-6 md:gap-8 w-full max-w-7xl mx-auto">
- 
-{activeMenu === 'overview' ? (
-<>
+ <aside className="project-sidebar" aria-label="Project navigation">
+   <div className="project-identity">
+     <div className="project-avatar"><LayoutDashboard size={21} /></div>
+     <div><strong>Alpha One</strong><span>Process roadmap</span></div>
+   </div>
+   <nav className="project-navigation" aria-label="Project views">
+     <button type="button" onClick={() => setActiveMenu('overview')}
+       aria-current={activeMenu === 'overview' ? 'page' : undefined}
+       className={`project-nav-item ${activeMenu === 'overview' ? 'is-active' : ''}`}>
+       <LayoutDashboard size={19} /><span>Overview</span>
+     </button>
+     <button type="button" onClick={() => setActiveMenu('roadmap')}
+       aria-current={activeMenu === 'roadmap' ? 'page' : undefined}
+       className={`project-nav-item ${activeMenu === 'roadmap' ? 'is-active' : ''}`}>
+       <Map size={19} /><span>Roadmap</span>
+     </button>
+     <button type="button" onClick={() => setActiveMenu('meeting')}
+       aria-current={activeMenu === 'meeting' ? 'page' : undefined}
+       className={`project-nav-item ${activeMenu === 'meeting' ? 'is-active' : ''}`}>
+       <CalendarDays size={19} /><span>Meeting Cycle</span>
+     </button>
+     <button type="button" onClick={() => setActiveMenu('defect')}
+       aria-current={activeMenu === 'defect' ? 'page' : undefined}
+       className={`project-nav-item ${activeMenu === 'defect' ? 'is-active' : ''}`}>
+       <Bug size={19} /><span>Issue Tracking</span>
+     </button>
+   </nav>
+   <div className="sidebar-footer">
+     <div className="sidebar-source"><LayoutGrid size={16} /><span>Google Sheets</span></div>
+     <span>Alpha One · 2026</span>
+   </div>
+ </aside>
+
+ <main className="workspace-main">
+   <div className="workspace-content">
+     <div className="project-breadcrumb" aria-label="Breadcrumb">
+       <span>Projects</span><span aria-hidden="true">/</span><span>Alpha One</span>
+     </div>
+ {activeMenu === 'overview' ? (
+<section className="project-view overview-view">
  {/* Header Action Row */}
- <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full">
+ <div className="page-heading flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full">
  <div>
  <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Project Overview</h1>
  <p className={`text-xs md:text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Alpha One 2026 • Real-time cloud sync</p>
  </div>
  
- <div className="flex gap-2 w-full md:w-auto items-center">
+ <div className="page-actions flex gap-2 w-full md:w-auto items-center">
  <button onClick={handleSyncFromGoogleSheet} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-700'}`}>
  <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} /> Sync
  </button>
@@ -1620,7 +1567,7 @@ const defectSegments = [
  {exportMenuOpen && (
  <>
  <div className="fixed inset-0 z-40" onClick={() => setExportMenuOpen(false)}></div>
- <div className={`absolute right-0 top-full mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`export-menu absolute right-0 top-full mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <button onClick={() => handleExport('xlsx', rawData, 'project_overview')} className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors relative z-50 ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'}`}>.xlsx</button>
  <button onClick={() => handleExport('csv', rawData, 'project_overview')} className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors relative z-50 ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'}`}>.csv</button>
  </div>
@@ -1633,39 +1580,39 @@ const defectSegments = [
  {/* Stacked progress bar (Overview) */}
  <StackedProgressBar segments={overviewSegments} total={totalTasks} isDarkMode={isDarkMode} />
  {/* KPI Modules & Filters */}
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+ <div className="project-summary grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
  
  {/* Left Col: KPIs */}
- <div className="lg:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-4">
- <div className={`p-4 rounded-xl border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Total</p>
+ <div className="summary-metrics lg:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <div className={`p-4 rounded-lg border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Total</p>
  <div className="flex items-baseline gap-1 mt-1">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-white' : 'text-black'}`}>{totalTasks}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-black'}`}>{totalTasks}</h2>
  </div>
  </div>
- <div className={`p-4 rounded-xl border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>UAT</p>
+ <div className={`p-4 rounded-lg border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>UAT</p>
  <div className="flex items-baseline gap-1 mt-1">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>{uatTasks}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>{uatTasks}</h2>
  </div>
  </div>
- <div className={`p-4 rounded-xl border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>In Progress</p>
+ <div className={`p-4 rounded-lg border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>In Progress</p>
  <div className="flex items-baseline gap-1 mt-1">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{inProgressTasks}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{inProgressTasks}</h2>
  </div>
  </div>
- <div className={`p-4 rounded-xl border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Production</p>
+ <div className={`p-4 rounded-lg border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Production</p>
  <div className="flex items-baseline gap-1 mt-1">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>{completedTasks}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>{completedTasks}</h2>
  </div>
  </div>
  </div>
 
  {/* Right Col: Progress & Filters */}
- <div className="lg:col-span-1 flex flex-col gap-4 justify-between">
- <div className={`p-4 rounded-xl border flex flex-col justify-center flex-1 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className="summary-controls lg:col-span-1 flex flex-col gap-4 justify-between">
+ <div className={`p-4 rounded-lg border flex flex-col justify-center flex-1 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-end mb-2">
  <p className={`text-sm font-semibold ${isDarkMode ? 'text-zinc-300' : 'text-zinc-800'}`}>Completion</p>
  <h2 className={`text-lg font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{progressPercent}%</h2>
@@ -1675,7 +1622,7 @@ const defectSegments = [
  </div>
  </div>
 
- <div className={`p-4 rounded-xl border flex flex-col gap-2 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-4 rounded-lg border flex flex-col gap-2 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex items-center gap-2 mb-1">
  <Filter size={14} className={isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} />
  <span className={`text-xs font-semibold ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>Filters</span>
@@ -1693,9 +1640,9 @@ const defectSegments = [
  </div>
 
  {/* Side-by-side Charts */}
- <div className="flex flex-col xl:flex-row gap-6 w-full">
+ <div className="project-charts flex flex-col xl:flex-row gap-6 w-full">
  {/* Burndown Chart */}
- <div className={`p-5 rounded-xl border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-5 rounded-lg border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-center mb-6 shrink-0">
  <div className="flex items-center gap-3">
  <h3 className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Burndown Chart</h3>
@@ -1703,7 +1650,7 @@ const defectSegments = [
  <div className={`w-6 h-3.5 rounded-full flex items-center p-0.5 transition-colors ${showChartLabels ? 'bg-blue-500' : (isDarkMode ? 'bg-zinc-700' : 'bg-zinc-300')}`}>
  <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform ${showChartLabels ? 'translate-x-2.5' : 'translate-x-0'}`} />
  </div>
- <span className={`text-[9px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
+ <span className={`text-[11px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
  </button>
  </div>
  <div className="flex gap-4 text-xs font-medium">
@@ -1717,7 +1664,7 @@ const defectSegments = [
  </div>
  
  {/* Accumulate Chart */}
- <div className={`p-5 rounded-xl border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-5 rounded-lg border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-center mb-6 shrink-0">
  <div className="flex items-center gap-3">
  <h3 className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Accumulated Done</h3>
@@ -1725,7 +1672,7 @@ const defectSegments = [
  <div className={`w-6 h-3.5 rounded-full flex items-center p-0.5 transition-colors ${showChartLabels ? 'bg-emerald-500' : (isDarkMode ? 'bg-zinc-700' : 'bg-zinc-300')}`}>
  <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform ${showChartLabels ? 'translate-x-2.5' : 'translate-x-0'}`} />
  </div>
- <span className={`text-[9px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
+ <span className={`text-[11px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
  </button>
  </div>
  <div className="flex gap-4 text-xs font-medium">
@@ -1740,8 +1687,8 @@ const defectSegments = [
  </div>
 
  {/* Kanban & Table Board */}
- <div className="flex flex-col mt-2">
- <div className="mb-4 flex items-center justify-between shrink-0">
+ <div className="work-board flex flex-col mt-2">
+ <div className="board-toolbar mb-4 flex items-center justify-between shrink-0">
  <h3 className={`font-semibold text-lg ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Board</h3>
  <div className="flex items-center gap-3">
  {/* Toggle Switch */}
@@ -1759,12 +1706,12 @@ const defectSegments = [
  <List size={14} /> List
  </button>
  </div>
- <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>{filteredData.length} tasks</span>
+ <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>{filteredData.length} tasks</span>
  </div>
  </div>
  
  {overviewBoardView === 'kanban' ? (
- <div className="flex gap-4 overflow-x-auto xl:grid xl:grid-cols-4 pb-4 items-start custom-scrollbar">
+ <div className="kanban-lanes custom-scrollbar">
  {columns.map(status => {
  const columnTasks = filteredData.filter(t => t.BoardStatus === status);
  const headerColors = isDarkMode ? {
@@ -1780,35 +1727,36 @@ const defectSegments = [
  };
 
  return (
- <div key={`ov-col-${status}`} className={`flex flex-col rounded-xl p-3 border shrink-0 w-[280px] xl:w-auto ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800' : 'bg-zinc-50/50 border-zinc-200'}`} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, status)}>
+ <div key={`ov-col-${status}`} className={`kanban-column flex flex-col ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800' : 'bg-zinc-50/50 border-zinc-200'}`} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, status)}>
  <div className="flex justify-between items-center mb-3">
  <h4 className={`font-semibold text-xs px-2 py-0.5 rounded border ${headerColors[status]}`}>
  {status === 'Task' ? 'In Progress' : status.toUpperCase()}
  </h4>
- <span className={`text-[10px] font-medium text-zinc-500`}>{columnTasks.length}</span>
+ <span className={`text-[11px] font-medium text-zinc-500`}>{columnTasks.length}</span>
  </div>
 
- <div className="flex flex-col gap-2 pb-2">
+ <div className="kanban-cards custom-scrollbar">
  {columnTasks.map(task => (
- <div key={`ov-task-${task.id}`} draggable onDragStart={(e) => handleDragStart(e, task.id)} className={`p-3 rounded-lg border-y border-r border-l-4 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm group ${task['Area']?.includes('BKK') ? 'border-l-orange-500' : 'border-l-blue-500'} ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700' : 'bg-white border-zinc-200 hover:border-zinc-300'}`}>
+ <div key={`ov-task-${task.id}`} draggable onDragStart={(e) => handleDragStart(e, task.id)} className={`work-item cursor-grab active:cursor-grabbing group ${task['Area']?.includes('BKK') ? 'border-l-orange-500' : 'border-l-blue-500'} ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700' : 'bg-white border-zinc-200 hover:border-zinc-300'}`}>
  <div className="flex justify-between items-start mb-2">
- <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-500'}`}>
+ <span className={`issue-key text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-500'}`}>
+ <CheckCircle size={13} className="issue-type" aria-hidden="true" />
  {overviewColA && task[overviewColA] ? task[overviewColA] : (task['No'] || task['ID'] || '-')}
  </span>
  {task['Area'] && (
- <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+ <span className={`area-tag text-[11px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
  {task['Area']}
  </span>
  )}
  </div>
  
- <h5 className={`font-medium text-xs mb-2 leading-snug line-clamp-2 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} title={task['Detail']}>
+ <h5 className={`work-item-title font-medium text-sm mb-2 leading-snug line-clamp-3 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} title={task['Detail']}>
  {task['Detail'] || 'No details provided'}
  </h5>
  
- <div className="flex flex-col gap-1.5 mt-auto pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800">
- <div className={`text-[9px] font-medium truncate ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>📁 {task['Task'] || 'Uncategorized'}</div>
- <div className={`flex items-center justify-between text-[9px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+ <div className="work-item-meta">
+ <div className={`text-[11px] font-medium truncate ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}><LayoutGrid size={12} className="inline-block shrink-0 mr-1" aria-hidden="true" /> {task['Task'] || 'Uncategorized'}</div>
+ <div className={`flex items-center justify-between text-[11px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
  <div className="flex items-center gap-1 min-w-0">
  <LayoutDashboard size={10} className="shrink-0" />
  <span className="truncate">{task['Module'] || 'No module'}</span>
@@ -1816,13 +1764,13 @@ const defectSegments = [
  {((overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '') || (overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '')) && (
  <div className="flex flex-col items-end gap-1 shrink-0 min-w-[92px]">
 	 {overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '' && (
-		 <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+		 <div className="flex items-center gap-2 text-[11px] font-semibold px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
 			 <CalendarDays size={12} />
 			 <span className="truncate">UAT: {formatDateDDMMYYYY(task[overviewColN])}</span>
 		 </div>
 	 )}
 	 {overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '' && (
-		 <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1 rounded-full bg-green-50 text-emerald-700 border border-green-100">
+		 <div className="flex items-center gap-2 text-[11px] font-semibold px-2 py-1 rounded-full bg-green-50 text-emerald-700 border border-green-100">
 			 <CalendarDays size={12} />
 			 <span className="truncate">Prod: {formatDateDDMMYYYY(task[overviewColO])}</span>
 		 </div>
@@ -1833,40 +1781,41 @@ const defectSegments = [
  </div>
  </div>
  ))}
- {columnTasks.length === 0 && <div className={`h-16 border border-dashed rounded-lg flex items-center justify-center text-xs font-medium ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'}`}>Drop here</div>}
+ {columnTasks.length === 0 && <div className={`board-empty h-16 border border-dashed rounded-lg flex items-center justify-center text-xs font-medium ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'}`}>Drop here</div>}
  </div>
  </div>
  );
  })}
  </div>
  ) : (
- <div className={`w-full overflow-x-auto rounded-xl border custom-scrollbar ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'}`}>
+ <div className={`issue-table w-full overflow-x-auto rounded-lg border custom-scrollbar ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'}`}>
  <table className="w-full text-left border-collapse min-w-[800px]">
  <thead>
  <tr className={`border-b ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50'}`}>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>ID</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Detail & Module</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Category</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Area</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Date</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Status</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>ID</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Detail & Module</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Category</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Area</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Date</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Status</th>
  </tr>
  </thead>
  <tbody>
  {filteredData.map(task => (
  <tr key={`table-task-${task.id}`} className={`border-b last:border-0 transition-colors ${isDarkMode ? 'border-zinc-800 hover:bg-zinc-900/50' : 'border-zinc-200 hover:bg-zinc-50/50'}`}>
  <td className="py-3 px-4">
- <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-700'}`}>
+ <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-700'}`}>
+ <CheckCircle size={13} className="issue-type" aria-hidden="true" />
  {overviewColA && task[overviewColA] ? task[overviewColA] : (task['No'] || task['ID'] || '-')}
  </span>
  </td>
  <td className="py-3 px-4 max-w-[300px]">
  <p className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} title={task['Detail']}>{task['Detail'] || '-'}</p>
- <p className={`text-[10px] mt-0.5 flex items-center gap-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}><LayoutDashboard size={10} /> {task['Module'] || '-'}</p>
+ <p className={`text-[11px] mt-0.5 flex items-center gap-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}><LayoutDashboard size={10} /> {task['Module'] || '-'}</p>
  </td>
  <td className={`py-3 px-4 text-xs font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{task['Task'] || '-'}</td>
  <td className="py-3 px-4">
- {task['Area'] ? <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>{task['Area']}</span> : '-'}
+ {task['Area'] ? <span className={`area-tag text-[11px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>{task['Area']}</span> : '-'}
  </td>
  <td className={`py-3 px-4 text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
  {((overviewColN && task[overviewColN] && task[overviewColN].toString().trim() !== '') || (overviewColO && task[overviewColO] && task[overviewColO].toString().trim() !== '')) ? (
@@ -1881,7 +1830,7 @@ const defectSegments = [
  ) : '-'}
  </td>
  <td className="py-3 px-4">
- <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${getStatusStyle(task.BoardStatus, isDarkMode)}`}>
+ <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${getStatusStyle(task.BoardStatus, isDarkMode)}`}>
  {task.BoardStatus === 'Task' ? 'IN PROGRESS' : task.BoardStatus.toUpperCase()}
  </span>
  </td>
@@ -1897,17 +1846,17 @@ const defectSegments = [
  </div>
  )}
  </div>
- </>
+ </section>
  ) : activeMenu === 'roadmap' ? (
- <>
+ <section className="project-view roadmap-view">
  {/* Header Action Row */}
- <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full mb-2">
+ <div className="page-heading flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full mb-2">
  <div>
  <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Project Roadmap</h1>
  <p className={`text-xs md:text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Alpha One 2026 Timeline & Milestones</p>
  </div>
  
- <div className="flex flex-wrap gap-2 w-full md:w-auto items-center">
+ <div className="page-actions flex flex-wrap gap-2 w-full md:w-auto items-center">
  
  {/* Toggle Switch สลับโหมด - Hidden */}
  <div className={`hidden flex items-center p-0.5 rounded-lg border mr-1 md:mr-2 ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
@@ -1950,7 +1899,7 @@ const defectSegments = [
  {exportMenuOpen && (
  <>
  <div className="fixed inset-0 z-40" onClick={() => setExportMenuOpen(false)}></div>
- <div className={`absolute right-0 top-full mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`export-menu absolute right-0 top-full mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <button onClick={() => handleExport('xlsx', roadmapData, 'project_roadmap')} className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors relative z-50 ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'}`}>.xlsx</button>
  <button onClick={() => handleExport('csv', roadmapData, 'project_roadmap')} className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors relative z-50 ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'}`}>.csv</button>
  </div>
@@ -1962,25 +1911,25 @@ const defectSegments = [
  
  {/* ส่งข้อมูล data เข้าไปเฉพาะตอนที่เลือกโหมด 'synced' เท่านั้น */}
  <RoadmapDashboard isDarkMode={isDarkMode} data={roadmapViewMode === 'synced' ? roadmapData : null} searchQuery={searchQuery} showBenefitOnly={roadmapShowBenefitOnly} />
- </>
+ </section>
  ) : activeMenu === 'meeting' ? (
- <div className="flex flex-col gap-4 w-full">
- <div className="flex flex-col justify-between items-start shrink-0 mb-2">
+ <section className="project-view meeting-view">
+ <div className="page-heading">
  <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Meeting Cycle</h1>
  <p className={`text-xs md:text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Weekly operations & sync schedule</p>
  </div>
  <MeetingCycleDashboard isDarkMode={isDarkMode} searchQuery={searchQuery} />
- </div>
+ </section>
  ) : activeMenu === 'defect' ? (
- <>
+ <section className="project-view issues-view">
  {/* Defect Header */}
- <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full">
+ <div className="page-heading flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 w-full">
  <div>
  <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Issue Tracking</h1>
  <p className={`text-xs md:text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Defect resolution dashboard</p>
  </div>
  
- <div className="flex flex-wrap gap-2 w-full md:w-auto items-center shrink-0 z-40">
+ <div className="page-actions flex flex-wrap gap-2 w-full md:w-auto items-center shrink-0 z-40">
  <button onClick={handleSyncFromGoogleSheet} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-700'}`}>
  <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} /> Sync
  </button>
@@ -1994,7 +1943,7 @@ const defectSegments = [
  {exportMenuOpen && (
  <>
  <div className="fixed inset-0 z-40" onClick={() => setExportMenuOpen(false)}></div>
- <div className={`absolute right-0 top-full mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`export-menu absolute right-0 top-full mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 py-1 animate-in fade-in slide-in-from-top-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <button onClick={() => handleExport('xlsx', defectData, 'defect_tracking')} className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors relative z-50 ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'}`}>.xlsx</button>
  <button onClick={() => handleExport('csv', defectData, 'defect_tracking')} className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors relative z-50 ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'}`}>.csv</button>
  </div>
@@ -2005,55 +1954,55 @@ const defectSegments = [
  </div>
 
  {/* Defect KPIs */}
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
- <div className="lg:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-4">
- <div className={`p-4 rounded-xl border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Total Defects</p>
+ <div className="project-summary grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+ <div className="summary-metrics lg:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <div className={`p-4 rounded-lg border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Total Defects</p>
  <div className="flex items-baseline gap-1 mt-1">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-white' : 'text-black'}`}>{defectTotalCount}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-black'}`}>{defectTotalCount}</h2>
  </div>
  </div>
 
- <div className={`p-4 rounded-xl border flex flex-col ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>BKK</p>
+ <div className={`p-4 rounded-lg border flex flex-col ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>BKK</p>
  <div className="flex items-baseline gap-1 mb-2">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>{defectBkkCount}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>{defectBkkCount}</h2>
  </div>
  <div className="flex flex-col gap-1 mt-auto">
- <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[9px] font-bold ${isDarkMode ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}>
+ <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[11px] font-bold ${isDarkMode ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}>
  <span className="flex items-center gap-1"><CheckCircle size={10} /> Done</span> <span>{defectBkkDone}</span>
  </div>
- <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[9px] font-bold ${isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
+ <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[11px] font-bold ${isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
  <span className="flex items-center gap-1"><AlertCircle size={10} /> Pending</span> <span>{defectBkkPending}</span>
  </div>
  </div>
  </div>
 
- <div className={`p-4 rounded-xl border flex flex-col ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Branch</p>
+ <div className={`p-4 rounded-lg border flex flex-col ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Branch</p>
  <div className="flex items-baseline gap-1 mb-2">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{defectBranchCount}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{defectBranchCount}</h2>
  </div>
  <div className="flex flex-col gap-1 mt-auto">
- <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[9px] font-bold ${isDarkMode ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}>
+ <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[11px] font-bold ${isDarkMode ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}>
  <span className="flex items-center gap-1"><CheckCircle size={10} /> Done</span> <span>{defectBranchDone}</span>
  </div>
- <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[9px] font-bold ${isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
+ <div className={`flex items-center justify-between px-1.5 py-0.5 rounded border text-[11px] font-bold ${isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
  <span className="flex items-center gap-1"><AlertCircle size={10} /> Pending</span> <span>{defectBranchPending}</span>
  </div>
  </div>
  </div>
  
- <div className={`p-4 rounded-xl border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
- <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Production</p>
+ <div className={`p-4 rounded-lg border flex flex-col justify-center ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Production</p>
  <div className="flex items-baseline gap-1 mt-auto">
- <h2 className={`text-3xl font-bold tracking-tighter ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>{defectProductionCount}</h2>
+ <h2 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>{defectProductionCount}</h2>
  </div>
  </div>
  </div>
 
- <div className="lg:col-span-1 flex flex-col gap-4 justify-between">
- <div className={`p-4 rounded-xl border flex flex-col justify-center flex-1 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className="summary-controls lg:col-span-1 flex flex-col gap-4 justify-between">
+ <div className={`p-4 rounded-lg border flex flex-col justify-center flex-1 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-end mb-2">
  <p className={`text-sm font-semibold ${isDarkMode ? 'text-zinc-300' : 'text-zinc-800'}`}>Resolution Rate</p>
  <h2 className={`text-lg font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{defectProgressPercent}%</h2>
@@ -2063,7 +2012,7 @@ const defectSegments = [
  </div>
  </div>
 
- <div className={`p-4 rounded-xl border flex flex-col gap-2 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-4 rounded-lg border flex flex-col gap-2 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex items-center gap-2 mb-1">
  <Filter size={14} className={isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} />
  <span className={`text-xs font-semibold ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>Filters</span>
@@ -2081,9 +2030,9 @@ const defectSegments = [
  </div>
 
  {/* Side-by-side Charts */}
- <div className="flex flex-col xl:flex-row gap-6 w-full">
+ <div className="project-charts flex flex-col xl:flex-row gap-6 w-full">
  {/* Burndown Chart */}
- <div className={`p-5 rounded-xl border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-5 rounded-lg border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-center mb-6 shrink-0">
  <div className="flex items-center gap-3">
  <h3 className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Defect Burndown</h3>
@@ -2091,7 +2040,7 @@ const defectSegments = [
  <div className={`w-6 h-3.5 rounded-full flex items-center p-0.5 transition-colors ${showChartLabels ? 'bg-blue-500' : (isDarkMode ? 'bg-zinc-700' : 'bg-zinc-300')}`}>
  <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform ${showChartLabels ? 'translate-x-2.5' : 'translate-x-0'}`} />
  </div>
- <span className={`text-[9px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
+ <span className={`text-[11px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
  </button>
  </div>
  <div className="flex gap-4 text-xs font-medium">
@@ -2105,7 +2054,7 @@ const defectSegments = [
  </div>
  
  {/* Accumulate Chart */}
- <div className={`p-5 rounded-xl border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+ <div className={`p-5 rounded-lg border flex flex-col flex-1 min-w-0 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-zinc-200'}`}>
  <div className="flex justify-between items-center mb-6 shrink-0">
  <div className="flex items-center gap-3">
  <h3 className={`font-semibold text-sm ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Accumulated Done</h3>
@@ -2113,7 +2062,7 @@ const defectSegments = [
  <div className={`w-6 h-3.5 rounded-full flex items-center p-0.5 transition-colors ${showChartLabels ? 'bg-emerald-500' : (isDarkMode ? 'bg-zinc-700' : 'bg-zinc-300')}`}>
  <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform ${showChartLabels ? 'translate-x-2.5' : 'translate-x-0'}`} />
  </div>
- <span className={`text-[9px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
+ <span className={`text-[11px] font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Labels</span>
  </button>
  </div>
  <div className="flex gap-4 text-xs font-medium">
@@ -2128,8 +2077,8 @@ const defectSegments = [
  </div>
 
  {/* Kanban & Table Board */}
- <div className="flex flex-col mt-2">
- <div className="mb-4 flex items-center justify-between shrink-0">
+ <div className="work-board flex flex-col mt-2">
+ <div className="board-toolbar mb-4 flex items-center justify-between shrink-0">
  <h3 className={`font-semibold text-lg ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Board</h3>
  <div className="flex items-center gap-3">
  {/* Toggle Switch */}
@@ -2147,49 +2096,50 @@ const defectSegments = [
  <List size={14} /> List
  </button>
  </div>
- <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>{filteredDefectData.length} issues</span>
+ <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>{filteredDefectData.length} issues</span>
  </div>
  </div>
  
  {defectBoardView === 'kanban' ? (
- <div className="flex gap-4 overflow-x-auto xl:grid xl:grid-cols-4 pb-4 items-start custom-scrollbar">
+ <div className="kanban-lanes custom-scrollbar">
  {columns.map(status => {
  const columnTasks = filteredDefectData.filter(t => t.BoardStatus === status);
  const titleLabel = status === 'Todo' ? 'TODO' : status === 'Task' ? 'IN PROGRESS' : status === 'UAT' ? 'RETEST' : 'DONE';
 
  return (
- <div key={`def-col-${status}`} className={`flex flex-col rounded-xl p-3 border shrink-0 w-[280px] xl:w-auto ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800' : 'bg-zinc-50/50 border-zinc-200'}`} onDragOver={handleDragOver} onDrop={(e) => handleDefectDrop(e, status)}>
+ <div key={`def-col-${status}`} className={`kanban-column flex flex-col ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800' : 'bg-zinc-50/50 border-zinc-200'}`} onDragOver={handleDragOver} onDrop={(e) => handleDefectDrop(e, status)}>
  <div className="flex justify-between items-center mb-3">
  <h4 className={`font-semibold text-xs px-2 py-0.5 rounded border ${getStatusStyle(status, isDarkMode)}`}>
  {titleLabel}
  </h4>
- <span className={`text-[10px] font-medium text-zinc-500`}>{columnTasks.length}</span>
+ <span className={`text-[11px] font-medium text-zinc-500`}>{columnTasks.length}</span>
  </div>
 
- <div className="flex flex-col gap-2 pb-2">
+ <div className="kanban-cards custom-scrollbar">
  {columnTasks.map(task => (
- <div key={`def-task-${task.id}`} draggable onDragStart={(e) => handleDragStart(e, task.id)} className={`p-3 rounded-lg border-y border-r border-l-4 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm group ${task['Priority']?.toLowerCase().includes('high') ? 'border-l-red-500' : (task['Area']?.includes('BKK') ? 'border-l-orange-500' : 'border-l-blue-500')} ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700' : 'bg-white border-zinc-200 hover:border-zinc-300'}`}>
+ <div key={`def-task-${task.id}`} draggable onDragStart={(e) => handleDragStart(e, task.id)} className={`work-item cursor-grab active:cursor-grabbing group ${task['Priority']?.toLowerCase().includes('high') ? 'border-l-red-500' : (task['Area']?.includes('BKK') ? 'border-l-orange-500' : 'border-l-blue-500')} ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700' : 'bg-white border-zinc-200 hover:border-zinc-300'}`}>
  <div className="flex justify-between items-start mb-2">
- <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-500'}`}>
+ <span className={`issue-key text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-zinc-100 border-zinc-200 text-zinc-500'}`}>
+ <CheckCircle size={13} className="issue-type" aria-hidden="true" />
  {colA && task[colA] ? task[colA] : (task['No'] || task['Issue ID'] || '-')}
  </span>
  {task['Area'] && (
- <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+ <span className={`area-tag text-[11px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
  {task['Area']}
  </span>
  )}
  </div>
  
- <h5 className={`font-medium text-xs mb-2 leading-snug line-clamp-2 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} title={task['Details'] || task['Detail']}>
+ <h5 className={`work-item-title font-medium text-sm mb-2 leading-snug line-clamp-3 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} title={task['Details'] || task['Detail']}>
  {task['Details'] || task['Detail'] || 'No details provided'}
  </h5>
  
- <div className="flex flex-col gap-1.5 mt-auto pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800">
- <div className={`text-[9px] font-medium truncate flex items-center gap-1 ${task['Priority']?.toLowerCase().includes('high') ? 'text-red-500' : (isDarkMode ? 'text-zinc-500' : 'text-zinc-500')}`}>
+ <div className="work-item-meta">
+ <div className={`text-[11px] font-medium truncate flex items-center gap-1 ${task['Priority']?.toLowerCase().includes('high') ? 'text-red-500' : (isDarkMode ? 'text-zinc-500' : 'text-zinc-500')}`}>
  {task['Priority']?.toLowerCase().includes('high') && <AlertCircle size={10} />}
- 📁 {task['System'] || task['Task'] || 'Uncategorized'}
+ <LayoutGrid size={12} className="inline-block shrink-0 mr-1" aria-hidden="true" /> {task['System'] || task['Task'] || 'Uncategorized'}
  </div>
- <div className={`flex items-center justify-between text-[9px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+ <div className={`flex items-center justify-between text-[11px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
  <div className="flex items-center gap-1 min-w-0">
  <LayoutDashboard size={10} className="shrink-0" />
  <span className="truncate">{task['Module'] || 'No module'}</span>
@@ -2198,50 +2148,51 @@ const defectSegments = [
  </div>
  </div>
  ))}
- {columnTasks.length === 0 && <div className={`h-16 border border-dashed rounded-lg flex items-center justify-center text-xs font-medium ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'}`}>Drop here</div>}
+ {columnTasks.length === 0 && <div className={`board-empty h-16 border border-dashed rounded-lg flex items-center justify-center text-xs font-medium ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'}`}>Drop here</div>}
  </div>
  </div>
  );
  })}
  </div>
  ) : (
- <div className={`w-full overflow-x-auto rounded-xl border custom-scrollbar ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'}`}>
+ <div className={`issue-table w-full overflow-x-auto rounded-lg border custom-scrollbar ${isDarkMode ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-white'}`}>
  <table className="w-full text-left border-collapse min-w-[800px]">
  <thead>
  <tr className={`border-b ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50'}`}>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Issue ID</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Details & Module</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>System</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Area</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Priority</th>
- <th className={`py-3 px-4 text-[10px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Status</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Issue ID</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Details & Module</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>System</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Area</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Priority</th>
+ <th className={`py-3 px-4 text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Status</th>
  </tr>
  </thead>
  <tbody>
  {filteredDefectData.map(task => (
  <tr key={`table-def-${task.id}`} className={`border-b last:border-0 transition-colors ${isDarkMode ? 'border-zinc-800 hover:bg-zinc-900/50' : 'border-zinc-200 hover:bg-zinc-50/50'}`}>
  <td className="py-3 px-4">
- <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-700'}`}>
+ <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-200 text-zinc-700'}`}>
+ <CheckCircle size={13} className="issue-type" aria-hidden="true" />
  {colA && task[colA] ? task[colA] : (task['No'] || task['Issue ID'] || '-')}
  </span>
  </td>
  <td className="py-3 px-4 max-w-[300px]">
  <p className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} title={task['Details'] || task['Detail']}>{task['Details'] || task['Detail'] || '-'}</p>
- <p className={`text-[10px] mt-0.5 flex items-center gap-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}><LayoutDashboard size={10} /> {task['Module'] || '-'}</p>
+ <p className={`text-[11px] mt-0.5 flex items-center gap-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}><LayoutDashboard size={10} /> {task['Module'] || '-'}</p>
  </td>
  <td className={`py-3 px-4 text-xs font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{task['System'] || task['Task'] || '-'}</td>
  <td className="py-3 px-4">
- {task['Area'] ? <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>{task['Area']}</span> : '-'}
+ {task['Area'] ? <span className={`area-tag text-[11px] font-medium px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>{task['Area']}</span> : '-'}
  </td>
  <td className="py-3 px-4">
  {task['Priority']?.toLowerCase().includes('high') ? (
- <span className="flex items-center gap-1 text-[10px] text-red-500 font-semibold"><AlertCircle size={10} /> {task['Priority']}</span>
+ <span className="flex items-center gap-1 text-[11px] text-red-500 font-semibold"><AlertCircle size={10} /> {task['Priority']}</span>
  ) : (
- <span className={`text-[10px] ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{task['Priority'] || '-'}</span>
+ <span className={`text-[11px] ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{task['Priority'] || '-'}</span>
  )}
  </td>
  <td className="py-3 px-4">
- <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${getStatusStyle(task.BoardStatus, isDarkMode)}`}>
+ <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${getStatusStyle(task.BoardStatus, isDarkMode)}`}>
  {task.BoardStatus === 'Todo' ? 'TODO' : task.BoardStatus === 'Task' ? 'IN PROGRESS' : task.BoardStatus === 'UAT' ? 'RETEST' : 'DONE'}
  </span>
  </td>
@@ -2257,15 +2208,15 @@ const defectSegments = [
  </div>
  )}
  </div>
- </>
+ </section>
  ) : null}
 
- <div className={`mt-8 pt-4 border-t text-center text-[10px] font-medium ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-200 text-zinc-400'}`}>
- Vercel Aesthetic Edition • 2026 Process Optimization
+ <div className={`workspace-footer mt-8 pt-4 border-t text-center text-[11px] font-medium ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-200 text-zinc-400'}`}>
+ Alpha One · Process Optimization · 2026
  </div>
 
  </div>
- </div>
+ </main>
  </div>
  );
 }
